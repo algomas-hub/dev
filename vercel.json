@@ -1,0 +1,13 @@
+{
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/build",
+  "env": {
+    "REACT_APP_NAME": "Test React Node App"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
