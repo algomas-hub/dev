@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
-function content() {
+function DashboardContent() {
     return (
       
-        <div class="container-fluid" role="main">
+        <div className="container-fluid" role="main">
             
             
             <h1>Home Content</h1>
@@ -16,4 +16,4 @@ function content() {
     );
 }
 
-export default content;
+export default DashboardContent;
