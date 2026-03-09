@@ -1,17 +1,13 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { Container, Box, Typography } from '@mui/material';
 
 function LinkContent() {
     return (
       
-        <div className="container-fluid" role="main">
-            
-            
-            <h1>Link Content</h1>
-            
-            
-            
-            </div>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Box role="main">
+                <Typography variant="h3">Link Content</Typography>
+            </Box>
+        </Container>
 
     );
 }
