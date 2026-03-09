@@ -1,7 +1,8 @@
-//import './App.css';
+import './App.css';
 import Nav from './Nav/Nav';
 import DashboardContent from   './Contents/DashboardContent';
 import LinkContent from './Contents/LinkContent';
+import MagazzinoContent from './Contents/MagazzinoContent';
 import { BrowserRouter, Route,Routes  } from 'react-router-dom';
 import { Container, Box } from '@mui/material';
 
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path='/' exact Component={DashboardContent}></Route>
           <Route path='/link' exact Component={LinkContent}></Route>
+          <Route path='/magazzino' exact Component={MagazzinoContent}></Route>
         </Routes>
       </Box>
     </BrowserRouter>

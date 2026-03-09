@@ -47,6 +47,9 @@ function Nav() {
           <Button component={RouterLink} to="/link" color="inherit">
             Link
           </Button>
+          <Button component={RouterLink} to="/magazzino" color="inherit">
+            Magazzino
+          </Button>
           <Button color="inherit" onClick={handleDropdownOpen}>
             Dropdown
           </Button>
@@ -94,6 +97,9 @@ function Nav() {
           </MenuItem>
           <MenuItem component={RouterLink} to="/link" onClick={handleMobileMenuClose}>
             Link
+          </MenuItem>
+          <MenuItem component={RouterLink} to="/magazzino" onClick={handleMobileMenuClose}>
+            Magazzino
           </MenuItem>
           <MenuItem onClick={handleDropdownOpen}>Dropdown</MenuItem>
           <MenuItem disabled>Disabled</MenuItem>
