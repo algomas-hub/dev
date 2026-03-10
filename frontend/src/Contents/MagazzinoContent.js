@@ -1,17 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Box,
-  Container,
   TextField,
-  Button,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
-  Paper,
   CircularProgress,
   Alert,
   Typography,
@@ -21,6 +17,7 @@ import {
   AccordionDetails,
   Pagination,
   Stack,
+  Paper,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -35,8 +32,7 @@ function MagazzinoContent() {
   const [searchTermine, setSearchTermine] = useState('');
   const [currentPageParent, setCurrentPageParent] = useState(1);
   const [currentPageChild, setCurrentPageChild] = useState({});
-  const [sortBy, setSortBy] = useState('codice');
-  const [sortOrder, setSortOrder] = useState('asc');
+
   const searchInputRef = useRef(null);
   const rowsPerPage = 10;
   const articoliPerPage = 5;

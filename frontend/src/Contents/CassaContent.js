@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Box,
-  Container,
   TextField,
   Button,
   Table,
@@ -11,7 +10,6 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  Paper,
   CircularProgress,
   Alert,
   Typography,
@@ -21,10 +19,10 @@ import {
   Grid,
   IconButton,
   Snackbar,
-  Chip,
   ButtonGroup,
   Stack,
   Checkbox,
+  Chip,
   Tooltip,
 } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -273,33 +271,6 @@ function CassaContent() {
     }
     return 0; // Se tutti i criteri sono uguali, mantieni l'ordine
   });
-
-  // Gestisci ordinamento multiplo tabella selezionati
-  const handleSortSelected = (column, event) => {
-    if (event && event.shiftKey) {
-      // Shift+click: aggiungi o rimuovi colonna dai criteri
-      setSortCriteriaSelected(prev => {
-        const existing = prev.find(c => c.column === column);
-        if (existing) {
-          // Se esiste, togli
-          return prev.filter(c => c.column !== column);
-        } else {
-          // Se non esiste, aggiungi
-          return [...prev, { column, order: 'asc' }];
-        }
-      });
-    } else {
-      // Senza Shift: questa diventa l'unico criterio
-      const existing = sortCriteriaSelected.find(c => c.column === column);
-      if (existing && sortCriteriaSelected.length === 1) {
-        // Se è già l'unico criterio, inverti l'ordine
-        setSortCriteriaSelected([{ column, order: existing.order === 'asc' ? 'desc' : 'asc' }]);
-      } else {
-        // Altrimenti fai diventare l'unico criterio
-        setSortCriteriaSelected([{ column, order: 'asc' }]);
-      }
-    }
-  };
 
   // Aggiungi articolo alla lista selezionati
   const handleAggiungi = (articolo) => {

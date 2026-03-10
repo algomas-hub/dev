@@ -11,21 +11,12 @@ import {
   Box,
   Container,
   Stack,
-  Typography,
+
 } from '@mui/material';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
 function Nav() {
-  const [anchorEl, setAnchorEl] = useState(null);
   const [mobileAnchor, setMobileAnchor] = useState(null);
-
-  const handleDropdownOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleDropdownClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleMobileMenuOpen = (event) => {
     setMobileAnchor(event.currentTarget);
