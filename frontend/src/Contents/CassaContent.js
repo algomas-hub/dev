@@ -47,7 +47,7 @@ function CassaContent() {
   const [toastSeverity, setToastSeverity] = useState('success');
   // Ordinamento multiplo: array di {column, order}
   const [sortCriteria, setSortCriteria] = useState([{ column: 'codice', order: 'asc' }]);
-  const [sortCriteriaSelected, setSortCriteriaSelected] = useState([{ column: 'codice', order: 'asc' }]);
+  const [sortCriteriaSelected] = useState([{ column: 'codice', order: 'asc' }]);
 
   // Focus su ricerca articoli al mount e dopo ogni modifica
   useEffect(() => {

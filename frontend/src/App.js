@@ -186,8 +186,6 @@ const theme = createTheme({
   },
 });
 
-const drawerWidth = 260;
-
 function App() {
   return (
     <ThemeProvider theme={theme}>
