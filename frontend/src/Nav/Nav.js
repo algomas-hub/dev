@@ -3,15 +3,17 @@ import { Link as RouterLink } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
-  Typography,
   Button,
   IconButton,
   Menu,
   MenuItem,
   TextField,
   Box,
+  Container,
+  Stack,
+  Typography,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
 function Nav() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -34,77 +36,88 @@ function Nav() {
   };
 
   return (
-    <AppBar position="static" color="default">
-      <Toolbar>
-        <Typography variant="h6" component={RouterLink} to="/" sx={{ textDecoration: 'none', color: 'inherit', mr: 3 }}>
-          Navbar
-        </Typography>
-        
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, flex: 1 }}>
-          <Button component={RouterLink} to="/" color="inherit">
-            Home
-          </Button>
-          <Button component={RouterLink} to="/link" color="inherit">
-            Link
-          </Button>
-          <Button component={RouterLink} to="/magazzino" color="inherit">
-            Magazzino
-          </Button>
-          <Button color="inherit" onClick={handleDropdownOpen}>
-            Dropdown
-          </Button>
-          <Button color="inherit" disabled>
-            Disabled
-          </Button>
-        </Box>
-
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleDropdownClose}
+    <AppBar
+      position="fixed"
+      sx={{
+        display: { xs: 'auto', md: 'none' },
+        zIndex: (theme) => theme.zIndex.drawer - 1,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Toolbar
+          disableGutters
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 1,
+          }}
         >
-          <MenuItem onClick={handleDropdownClose}>Action</MenuItem>
-          <MenuItem onClick={handleDropdownClose}>Another action</MenuItem>
-          <MenuItem onClick={handleDropdownClose}>Something else here</MenuItem>
-        </Menu>
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              textDecoration: 'none',
+              color: 'inherit',
+            }}
+          >
+            <img
+              src="/logo.png"
+              alt="Logo"
+              style={{
+                height: '40px',
+                width: 'auto',
+                objectFit: 'contain',
+              }}
+            />
+          </Box>
 
-        <TextField
-          size="small"
-          placeholder="Search"
-          variant="outlined"
-          sx={{ ml: 2, display: { xs: 'none', md: 'block' } }}
-        />
-        <Button color="inherit" sx={{ ml: 1, display: { xs: 'none', md: 'block' } }}>
-          Search
-        </Button>
+          <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Button component={RouterLink} to="/cassa" size="small">
+              Cassa
+            </Button>
+            <Button component={RouterLink} to="/magazzino" size="small">
+              Magazzino
+            </Button>
+          </Stack>
 
-        <IconButton
-          color="inherit"
-          onClick={handleMobileMenuOpen}
-          sx={{ display: { xs: 'block', md: 'none' } }}
-        >
-          <MenuIcon />
-        </IconButton>
+          <TextField
+            size="small"
+            placeholder="Search"
+            variant="outlined"
+            sx={{
+              display: { xs: 'none', md: 'block' },
+              width: 200,
+            }}
+          />
 
-        <Menu
-          anchorEl={mobileAnchor}
-          open={Boolean(mobileAnchor)}
-          onClose={handleMobileMenuClose}
-          sx={{ display: { xs: 'block', md: 'none' } }}
-        >
-          <MenuItem component={RouterLink} to="/" onClick={handleMobileMenuClose}>
-            Home
-          </MenuItem>
-          <MenuItem component={RouterLink} to="/link" onClick={handleMobileMenuClose}>
-            Link
-          </MenuItem>
-          <MenuItem component={RouterLink} to="/magazzino" onClick={handleMobileMenuClose}>
-            Magazzino
-          </MenuItem>
-          <MenuItem onClick={handleDropdownOpen}>Dropdown</MenuItem>
-          <MenuItem disabled>Disabled</MenuItem>
-        </Menu>
-      </Toolbar>
+          <IconButton color="inherit" onClick={handleMobileMenuOpen} sx={{ display: { xs: 'block', md: 'none' } }}>
+            <MenuRoundedIcon />
+          </IconButton>
+
+          <Menu
+            anchorEl={mobileAnchor}
+            open={Boolean(mobileAnchor)}
+            onClose={handleMobileMenuClose}
+          >
+            <MenuItem component={RouterLink} to="/cassa" onClick={handleMobileMenuClose}>
+              Cassa
+            </MenuItem>
+            <MenuItem component={RouterLink} to="/magazzino" onClick={handleMobileMenuClose}>
+              Magazzino
+            </MenuItem>
+            <MenuItem component={RouterLink} to="/" onClick={handleMobileMenuClose}>
+              Home
+            </MenuItem>
+            <MenuItem component={RouterLink} to="/link" onClick={handleMobileMenuClose}>
+              Link
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 }

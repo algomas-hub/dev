@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Container,
@@ -10,73 +10,75 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Paper,
   CircularProgress,
   Alert,
   Typography,
+  InputAdornment,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  createTheme,
-  ThemeProvider,
-  InputAdornment,
   Pagination,
+  Stack,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-// Crea il tema dark
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#64B5F6',
-    },
-    secondary: {
-      main: '#81C784',
-    },
-    background: {
-      default: '#121212',
-      paper: '#1e1e1e',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#b0bec5',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  },
-});
+// Tema gestito in App.js
+
 
 function MagazzinoContent() {
   const [movimenti, setMovimenti] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchSku, setSearchSku] = useState('');
-  const [searchDescrizione, setSearchDescrizione] = useState('');
+  const [searchTermine, setSearchTermine] = useState('');
   const [currentPageParent, setCurrentPageParent] = useState(1);
   const [currentPageChild, setCurrentPageChild] = useState({});
+  const [sortBy, setSortBy] = useState('codice');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const searchInputRef = useRef(null);
   const rowsPerPage = 10;
   const articoliPerPage = 5;
 
   // Carica i movimenti magazzino al montaggio
   useEffect(() => {
-    fetchMovimenti();
+    fetchMovimenti('');
   }, []);
 
-  const fetchMovimenti = async (sku = '', desc = '') => {
+  // Mantieni il focus sul campo ricerca
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [loading]);
+
+  // Effetto per ricerca automatica
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPageParent(1);
+      setCurrentPageChild({});
+      if (searchTermine.trim().length >= 3) {
+        fetchMovimenti(searchTermine);
+      } else if (searchTermine.trim().length === 0) {
+        fetchMovimenti('');
+      }
+    }, 2000); // Debounce di 2 secondi
+
+    return () => clearTimeout(timer);
+  }, [searchTermine]);
+
+  const fetchMovimenti = async (termine = '') => {
     setLoading(true);
     setError(null);
     try {
-      let url = '/api/magazzino?limit=500';
+      // Se c'è un filtro, usa limit 500. Senza filtro, carica più dati per avere tutti gli articoli
+      const limit = termine.trim() ? 500 : 5000;
+      let url = `/api/magazzino?limit=${limit}`;
       
-      if (sku.trim()) {
-        // Filtra per Articolo se fornito
-        url += `&articolo=${encodeURIComponent(sku.trim())}`;
-      } else if (desc.trim()) {
-        // Filtra per Descrizione se fornito
-        url += `&descrizione=${encodeURIComponent(desc.trim())}`;
+      if (termine.trim()) {
+        // Ricerca nel codice articolo
+        url += `&articolo=${encodeURIComponent(termine.trim())}`;
       }
 
       const response = await fetch(url);
@@ -105,32 +107,20 @@ function MagazzinoContent() {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setCurrentPageParent(1);
-    setCurrentPageChild({});
-    fetchMovimenti(searchSku, searchDescrizione);
-  };
-
-  const handleReset = () => {
-    setSearchSku('');
-    setSearchDescrizione('');
-    setCurrentPageParent(1);
-    setCurrentPageChild({});
-    fetchMovimenti('', '');
-  };
-
   // Calcola il segno della quantità basato su causale
   const getQuantitaConSegno = (movimento) => {
     const quantita = parseFloat(movimento.quantita) || 0;
     const causale = movimento.causale || '';
     
-    // Se causale è 2 = uscito dal magazzino (positivo)
-    // Se causale è 3 = aggiunto a magazzino (negativo)
+    // Logica corretta:
+    // Causale 2 = aggiunge quantità (positivo)
+    // Causale 3 = toglie quantità (negativo)
     if (causale === '2' || causale === 2) {
-      return Math.abs(quantita);
+      return quantita;
+    } else if (causale === '3' || causale === 3) {
+      return -quantita;
     }
-    return -Math.abs(quantita);
+    return quantita; // Default positivo
   };
 
   // Calcola il totale delle quantità
@@ -190,100 +180,42 @@ function MagazzinoContent() {
   };
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <Box sx={{ backgroundColor: '#121212', minHeight: '100vh', py: 4 }}>
-        <Container maxWidth="lg">
-          <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold', color: '#64B5F6' }}>
-            📦 Movimenti Magazzino
-      </Typography>
+    <Box sx={{ p: 3 }}>
+      <Stack spacing={2}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+          📦 Movimenti Magazzino
+        </Typography>
 
-      {/* Barra di Ricerca */}
-      <Paper sx={{ p: 3, mb: 3, backgroundColor: '#1e1e1e', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)' }}>
-        <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-          <TextField
-            label="Ricerca per Articolo"
-            variant="outlined"
-            size="small"
-            value={searchSku}
-            onChange={(e) => setSearchSku(e.target.value)}
-            placeholder="Es: ARTICOLO123"
-            sx={{ 
-              flex: 1,
-              minWidth: '200px',
-              '& .MuiOutlinedInput-root': {
-                color: '#fff',
-                '& fieldset': {
-                  borderColor: '#64B5F6',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#81C784',
-                },
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#90caf9',
-                opacity: 0.7,
-              },
-            }}
-          />
-          <TextField
-            label="Ricerca per Descrizione"
-            variant="outlined"
-            size="small"
-            value={searchDescrizione}
-            onChange={(e) => setSearchDescrizione(e.target.value)}
-            placeholder="Es: componente"
-            sx={{ 
-              flex: 1,
-              minWidth: '200px',
-              '& .MuiOutlinedInput-root': {
-                color: '#fff',
-                '& fieldset': {
-                  borderColor: '#64B5F6',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#81C784',
-                },
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#90caf9',
-                opacity: 0.7,
-              },
-            }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            startIcon={<SearchIcon />}
-            sx={{
-              backgroundColor: '#64B5F6',
-              color: '#000',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: '#81C784',
-              },
-            }}
-          >
-            Cerca
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleReset}
-            sx={{
-              borderColor: '#64B5F6',
-              color: '#64B5F6',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: 'rgba(100, 181, 246, 0.1)',
-                borderColor: '#81C784',
-              },
-            }}
-          >
-            Ripristina
-          </Button>
+        {/* Barra di Ricerca */}
+        <Paper sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <TextField
+              ref={searchInputRef}
+              fullWidth
+              label="Ricerca Articoli"
+              variant="outlined"
+              size="small"
+              value={searchTermine}
+              onChange={(e) => setSearchTermine(e.target.value)}
+              placeholder="Digita almeno 3 caratteri..."
+              disabled={loading}
+              autoFocus={true}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {loading ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <SearchIcon color="action" />
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+            />
         </Box>
-        {searchSku && (
+        {searchTermine && (
           <Typography variant="body2" sx={{ color: '#81C784', fontStyle: 'italic' }}>
-            ✓ Filtro attivo: Articolo contiene "<strong>{searchSku}</strong>"
+            ✓ Ricerca attiva: "<strong>{searchTermine}</strong>"
           </Typography>
         )}
       </Paper>
@@ -304,16 +236,19 @@ function MagazzinoContent() {
 
       {/* Tabella Movimenti */}
       {!loading && !error && (
-        <>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Typography variant="subtitle2" sx={{ mb: 2, color: '#90caf9', fontWeight: 'bold' }}>
             📋 Trovati {movimenti.length} movimenti
           </Typography>
 
           {movimenti.length > 0 ? (
-            <>
+            <Box sx={{ flex: 1, overflow: 'auto' }}>
               {getArticoliPaginati().map(([articolo, movimentiArticolo]) => {
                 const totaleArticolo = getTotalePerArticolo(movimentiArticolo);
-                const descrizione = movimentiArticolo[0]?.descrizione || '-';
+                const descrizione = (movimentiArticolo[0]?.descrizione || '-').replace(/\[.*?\]/g, '').trim().toUpperCase();
+                const marca = String(movimentiArticolo[0]?.marca_estratto || movimentiArticolo[0]?.fornitore || '-');
+                const colore = String(movimentiArticolo[0]?.colore_estratto || movimentiArticolo[0]?.colore || '-');
+                const taglia = String(movimentiArticolo[0]?.taglia_estratta || movimentiArticolo[0]?.dimensioni || '-');
                 return (
                   <Accordion 
                     key={articolo} 
@@ -337,32 +272,85 @@ function MagazzinoContent() {
                         },
                       }}
                     >
-                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-                        <Typography sx={{ fontWeight: 'bold', color: '#64B5F6', width: '180px' }}>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', width: '100%', justifyContent: 'space-between', flexWrap: 'nowrap', overflowX: 'auto' }}>
+                        <Typography sx={{ fontWeight: 'bold', color: '#64B5F6', minWidth: '100px', whiteSpace: 'nowrap' }}>
                           📦 {articolo}
                         </Typography>
-                        <Typography sx={{ color: '#b0bec5', width: '300px', fontSize: '0.95rem' }}>
+                        <Typography sx={{ 
+                          color: '#b0bec5', 
+                          fontSize: '0.85rem',
+                          maxWidth: '350px',
+                          wordBreak: 'break-word',
+                          whiteSpace: 'normal',
+                          lineHeight: '1.3',
+                          flex: '0 1 auto'
+                        }}>
                           {descrizione}
                         </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '120px' }}>
+                        <Typography sx={{ color: '#90caf9', minWidth: '110px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                          Marca: {marca.toUpperCase()}
+                        </Typography>
+                        <Typography sx={{ color: '#90caf9', minWidth: '120px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                          Colore: {colore.toUpperCase()}
+                        </Typography>
+                        <Typography sx={{ color: '#90caf9', minWidth: '80px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                          Taglia: {taglia.toUpperCase()}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '110px', whiteSpace: 'nowrap' }}>
                           <Typography sx={{ fontWeight: 'bold', color: '#64B5F6', fontSize: '18px' }}>
                             {totaleArticolo > 0 ? '+' : ''}{Math.round(totaleArticolo)} pz
                           </Typography>
                         </Box>
-                        <Typography variant="body2" sx={{ color: '#90caf9', width: '80px', textAlign: 'right' }}>
+                        <Typography variant="body2" sx={{ color: '#90caf9', minWidth: '80px', textAlign: 'right' }}>
                           ({movimentiArticolo.length} mov.)
                         </Typography>
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ p: 0 }}>
-                      <TableContainer sx={{ backgroundColor: '#1e1e1e' }}>
-                        <Table sx={{ minWidth: 650 }}>
+                      <TableContainer sx={{ backgroundColor: 'rgba(26, 26, 26, 0.8)', maxHeight: '500px', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }}>
+                        <Table stickyHeader sx={{ tableLayout: 'fixed' }}>
                           <TableHead>
-                            <TableRow sx={{ backgroundColor: '#2a2a2a', borderBottom: '2px solid #3a3a3a' }}>
-                              <TableCell sx={{ fontWeight: 'bold', color: '#64B5F6', width: '10%' }}>ID</TableCell>
-                              <TableCell align="center" sx={{ fontWeight: 'bold', color: '#64B5F6', width: '20%' }}>Quantità</TableCell>
-                              <TableCell align="center" sx={{ fontWeight: 'bold', color: '#64B5F6', width: '30%' }}>Causale</TableCell>
-                              <TableCell align="center" sx={{ fontWeight: 'bold', color: '#64B5F6', width: '40%' }}>Data</TableCell>
+                            <TableRow sx={{ backgroundColor: '#262626', height: '50px' }}>
+                              <TableCell sx={{ 
+                                fontWeight: '600', 
+                                color: '#fff',
+                                borderBottom: 'none',
+                                width: '80px',
+                                padding: '16px 12px',
+                                textAlign: 'left',
+                                fontSize: '0.9rem',
+                                letterSpacing: '0.5px'
+                              }}>ID</TableCell>
+                              <TableCell sx={{ 
+                                fontWeight: '600', 
+                                color: '#fff',
+                                borderBottom: 'none',
+                                width: '130px',
+                                padding: '16px 12px',
+                                textAlign: 'center',
+                                fontSize: '0.9rem',
+                                letterSpacing: '0.5px'
+                              }}>Quantità</TableCell>
+                              <TableCell sx={{ 
+                                fontWeight: '600', 
+                                color: '#fff',
+                                borderBottom: 'none',
+                                width: '150px',
+                                padding: '16px 12px',
+                                textAlign: 'center',
+                                fontSize: '0.9rem',
+                                letterSpacing: '0.5px'
+                              }}>Causale</TableCell>
+                              <TableCell sx={{ 
+                                fontWeight: '600', 
+                                color: '#fff',
+                                borderBottom: 'none',
+                                width: '140px',
+                                padding: '16px 12px',
+                                textAlign: 'center',
+                                fontSize: '0.9rem',
+                                letterSpacing: '0.5px'
+                              }}>Data</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
@@ -370,38 +358,98 @@ function MagazzinoContent() {
                               <TableRow
                                 key={index}
                                 sx={{
-                                  backgroundColor: '#1e1e1e',
-                                  borderBottom: '1px solid #3a3a3a',
-                                  '&:nth-of-type(odd)': { backgroundColor: '#252525' },
-                                  '&:hover': { backgroundColor: '#2f2f2f' },
-                                  color: '#fff',
+                                  backgroundColor: index % 2 === 0 ? '#1e1e1e' : '#252525',
+                                  borderBottom: '1px solid #333333',
+                                  '&:hover': { backgroundColor: '#2a2a3e' },
+                                  height: '55px'
                                 }}
                               >
-                                <TableCell sx={{ color: '#b0bec5', width: '10%' }}>{movimento.id || '-'}</TableCell>
-                                <TableCell align="center" sx={{ color: '#b0bec5', width: '20%' }}>
-                                  <span style={{ fontWeight: 'bold', color: getQuantitaConSegno(movimento) < 0 ? '#ff6b6b' : '#81C784' }}>
+                                <TableCell sx={{ 
+                                  color: '#90caf9', 
+                                  fontWeight: '500', 
+                                  padding: '12px',
+                                  fontSize: '0.9rem',
+                                  width: '80px',
+                                  textAlign: 'left',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {movimento.id || '—'}
+                                </TableCell>
+                                <TableCell sx={{ 
+                                  padding: '12px',
+                                  width: '130px',
+                                  textAlign: 'center'
+                                }}>
+                                  <span style={{ 
+                                    fontWeight: 'bold', 
+                                    color: getQuantitaConSegno(movimento) < 0 ? '#ff6b6b' : '#81C784',
+                                    fontSize: '0.95rem'
+                                  }}>
                                     {getQuantitaConSegno(movimento) > 0 ? '+' : ''}{Math.round(getQuantitaConSegno(movimento))}
                                   </span>
                                 </TableCell>
-                                <TableCell align="center" sx={{ width: '30%' }}>
-                                  <span style={{ fontWeight: 'bold', backgroundColor: '#2a2a2a', color: '#fff', padding: '6px 12px', borderRadius: '6px', border: '1px solid #3a3a3a', display: 'inline-block' }}>
-                                    {movimento.causale === '2' || movimento.causale === 2 ? '✓ Ingresso' : movimento.causale === '3' || movimento.causale === 3 ? '✗ Uscita' : movimento.causale || '-'}
+                                <TableCell sx={{ 
+                                  padding: '12px',
+                                  width: '150px',
+                                  textAlign: 'center'
+                                }}>
+                                  <span style={{ 
+                                    fontWeight: '600', 
+                                    backgroundColor: movimento.causale === '2' || movimento.causale === 2 ? '#1B5E20' : '#B71C1C',
+                                    color: '#fff', 
+                                    padding: '6px 10px', 
+                                    borderRadius: '4px',
+                                    fontSize: '0.8rem',
+                                    display: 'inline-block',
+                                    whiteSpace: 'nowrap'
+                                  }}>
+                                    {movimento.causale === '2' || movimento.causale === 2 ? '✓ Ingresso' : movimento.causale === '3' || movimento.causale === 3 ? '✗ Uscita' : movimento.causale || '—'}
                                   </span>
                                 </TableCell>
-                                <TableCell align="center" sx={{ color: '#b0bec5', width: '40%' }}>{movimento.data || movimento.date ? new Date(movimento.data || movimento.date).toLocaleDateString('it-IT') : '-'}</TableCell>
+                                <TableCell sx={{ 
+                                  color: '#b0bec5', 
+                                  padding: '12px', 
+                                  fontSize: '0.9rem',
+                                  width: '140px',
+                                  textAlign: 'center'
+                                }}>
+                                  {movimento.data || movimento.date ? new Date(movimento.data || movimento.date).toLocaleDateString('it-IT') : '—'}
+                                </TableCell>
                               </TableRow>
                             ))}
                             {/* Riga di Totale per Articolo */}
-                            <TableRow sx={{ backgroundColor: '#2a2a2a', borderTop: '2px solid #3a3a3a', fontWeight: 'bold' }}>
-                              <TableCell sx={{ fontWeight: 'bold', textAlign: 'center', color: '#64B5F6', width: '10%' }}>
-                                TOTALE:
+                            <TableRow sx={{ 
+                              backgroundColor: '#1a3a1a', 
+                              borderTop: '2px solid #2e7d32',
+                              fontWeight: 'bold',
+                              height: '55px'
+                            }}>
+                              <TableCell sx={{ 
+                                fontWeight: 'bold', 
+                                color: '#81C784',
+                                padding: '12px',
+                                fontSize: '0.95rem',
+                                width: '80px',
+                                textAlign: 'left'
+                              }}>
+                                TOTALE
                               </TableCell>
-                              <TableCell align="center">
-                                <span style={{ fontWeight: 'bold', color: totaleArticolo < 0 ? '#ff6b6b' : '#81C784', fontSize: '15px' }}>
+                              <TableCell sx={{ 
+                                padding: '12px',
+                                width: '130px',
+                                textAlign: 'center'
+                              }}>
+                                <span style={{ 
+                                  fontWeight: 'bold', 
+                                  color: totaleArticolo < 0 ? '#ff6b6b' : '#81C784', 
+                                  fontSize: '1rem'
+                                }}>
                                   {totaleArticolo > 0 ? '+' : ''}{Math.round(totaleArticolo)} pz
                                 </span>
                               </TableCell>
-                              <TableCell colSpan="2" />
+                              <TableCell sx={{ width: '150px' }} />
+                              <TableCell sx={{ width: '140px' }} />
                             </TableRow>
                           </TableBody>
                         </Table>
@@ -472,17 +520,16 @@ function MagazzinoContent() {
                   </span>
                 </Box>
               </Paper>
-            </>
+            </Box>
           ) : (
             <Alert severity="info" sx={{ backgroundColor: 'rgba(25, 118, 210, 0.2)', color: '#64B5F6', borderColor: '#64B5F6' }}>
               ℹ️ Nessun movimento trovato
             </Alert>
           )}
-        </>
+        </Box>
       )}
-        </Container>
-      </Box>
-    </ThemeProvider>
+      </Stack>
+    </Box>
   );
 }
 

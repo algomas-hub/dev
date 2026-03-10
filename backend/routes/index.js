@@ -2,6 +2,23 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
+// Funzione per estrarre marca, colore e taglia dalla descrizione
+// Formato: [marca] nome [colore] [taglia]
+const estraiDatiDescrizione = (descrizione) => {
+  if (!descrizione) return { marca: null, colore: null, taglia: null };
+  
+  const matches = descrizione.match(/\[([^\]]+)\]/g);
+  if (!matches || matches.length === 0) {
+    return { marca: null, colore: null, taglia: null };
+  }
+  
+  const marca = matches.length > 0 ? matches[0].slice(1, -1) : null; // Prima parentesi
+  const colore = matches.length > 1 ? matches[1].slice(1, -1) : null; // Seconda parentesi
+  const taglia = matches.length > 2 ? matches[2].slice(1, -1) : null; // Terza parentesi
+  
+  return { marca, colore, taglia };
+};
+
 // GET - Recupera dati da una tabella
 // Uso: GET /api/select?table=nome_tabella&limit=10
 router.get('/select', async (req, res) => {
@@ -180,6 +197,7 @@ router.get('/schema/:table', async (req, res) => {
 // GET - Movimenti Magazzino con JOIN Articoli
 // Uso: GET /api/magazzino?articolo=EH19AR-ETS&limit=500
 // Uso: GET /api/magazzino?descrizione=componente&limit=500
+// Ricerca in: codice articolo E descrizione
 router.get('/magazzino', async (req, res) => {
   try {
     const { articolo, descrizione, limit = 500, offset = 0 } = req.query;
@@ -190,6 +208,9 @@ router.get('/magazzino', async (req, res) => {
         m.id,
         m.articolo,
         a.descrizione,
+        a.fornitore,
+        a.colore,
+        a.dimensioni,
         m.quantita,
         m.causale,
         m.data
@@ -201,27 +222,35 @@ router.get('/magazzino', async (req, res) => {
     let params = [parseInt(limit), parseInt(offset)];
 
     if (articolo && articolo.trim()) {
+      // Ricerca sia nel codice articolo che nella descrizione
       query = `
         SELECT 
           m.id,
           m.articolo,
           a.descrizione,
+          a.fornitore,
+          a.colore,
+          a.dimensioni,
           m.quantita,
           m.causale,
           m.data
         FROM movimenti_magazzino m
         LEFT JOIN articoli a ON m.articolo = a.codice
-        WHERE m.articolo = ?
+        WHERE m.articolo LIKE ? OR a.descrizione LIKE ?
         ORDER BY m.data ASC
         LIMIT ? OFFSET ?
       `;
-      params = [articolo.trim(), parseInt(limit), parseInt(offset)];
+      const searchTerm = `%${articolo.trim()}%`;
+      params = [searchTerm, searchTerm, parseInt(limit), parseInt(offset)];
     } else if (descrizione && descrizione.trim()) {
       query = `
         SELECT 
           m.id,
           m.articolo,
           a.descrizione,
+          a.fornitore,
+          a.colore,
+          a.dimensioni,
           m.quantita,
           m.causale,
           m.data
@@ -236,7 +265,139 @@ router.get('/magazzino', async (req, res) => {
 
     const [rows] = await connection.query(query, params);
     connection.release();
-    res.json({ success: true, data: rows });
+
+    // Estrai marca, colore e taglia dalla descrizione
+    const rowsConDati = rows.map(row => {
+      const { marca, colore, taglia } = estraiDatiDescrizione(row.descrizione);
+      return {
+        ...row,
+        marca_estratto: marca,
+        colore_estratto: colore,
+        taglia_estratta: taglia
+      };
+    });
+
+    res.json({ success: true, data: rowsConDati });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Ricerca articoli per codice, descrizione e codice_fornitore
+// Uso: GET /api/articoli/search?termine=ABC123
+// Cerca in: codice, descrizione (originale con parentesi), codice_fornitore (1-6) e ritorna quantità disponibile
+router.get('/articoli/search', async (req, res) => {
+  try {
+    const { termine } = req.query;
+
+    if (!termine || termine.trim().length < 3) {
+      return res.status(400).json({ error: 'termine must be at least 3 characters' });
+    }
+
+    const connection = await pool.getConnection();
+    const firstTerm = `%${termine.trim().split(/\s+/)[0]}%`;
+    
+    // Step 1: ricerca veloce - solo articoli matching
+    const searchQuery = `
+      SELECT DISTINCT a.codice 
+      FROM articoli a
+      WHERE 
+        a.codice LIKE ? OR
+        a.descrizione LIKE ? OR
+        a.codice_fornitore LIKE ? OR
+        a.codice_fornitore2 LIKE ? OR
+        a.codice_fornitore3 LIKE ? OR
+        a.codice_fornitore4 LIKE ? OR
+        a.codice_fornitore5 LIKE ? OR
+        a.codice_fornitore6 LIKE ?
+      LIMIT 150
+    `;
+
+    const [searchResults] = await connection.query(searchQuery, [firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm]);
+    
+    if (searchResults.length === 0) {
+      connection.release();
+      return res.json({ success: true, data: [] });
+    }
+
+    // Step 2: recupera dettagli per articoli trovati (senza movimenti per velocità)
+    const codici = searchResults.map(r => r.codice);
+    
+    const detailsQuery = `
+      SELECT 
+        a.codice,
+        a.descrizione,
+        a.colore,
+        a.dimensioni,
+        a.codice_fornitore,
+        a.codice_fornitore2,
+        a.codice_fornitore3,
+        a.codice_fornitore4,
+        a.codice_fornitore5,
+        a.codice_fornitore6,
+        0 as quantita_disponibile,
+        COALESCE(ap.prezzo, 0) as prezzo_originale,
+        COALESCE(ap.sconto1, 0) as sconto1,
+        COALESCE(ap.sconto2, 0) as sconto2,
+        CASE 
+          WHEN COALESCE(ap.prezzo, 0) > 0 THEN ROUND(COALESCE(ap.prezzo, 0) * (1 - COALESCE(ap.sconto1, 0) / 100) * (1 - COALESCE(ap.sconto2, 0) / 100), 2)
+          ELSE 0
+        END as prezzo_scontato
+      FROM articoli a
+      LEFT JOIN articoli_prezzi ap ON a.codice = ap.articolo AND ap.listino = 'BASE'
+      WHERE a.codice IN (${codici.map(() => '?').join(',')})
+    `;
+
+    const [rows] = await connection.query(detailsQuery, codici);
+    connection.release();
+
+    // Estrai marca, colore e taglia dalla descrizione
+    const rowsConDati = rows.map(row => {
+      const { marca, colore, taglia } = estraiDatiDescrizione(row.descrizione);
+      return {
+        ...row,
+        marca_estratto: marca,
+        colore_estratto: colore,
+        taglia_estratta: taglia
+      };
+    });
+
+    res.json({ success: true, data: rowsConDati });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Registra movimento magazzino
+// Uso: POST /api/movimenti/registra con body: { articolo: "ABC123", quantita: 5, causale: 2, deposito: 2, note: "..." }
+router.post('/movimenti/registra', async (req, res) => {
+  try {
+    const { articoli } = req.body;
+
+    if (!articoli || !Array.isArray(articoli) || articoli.length === 0) {
+      return res.status(400).json({ error: 'articoli array is required' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    for (const item of articoli) {
+      const { articolo, quantita, causale = 2, deposito = 2, note = 'aggiornamento da preventivo - scarico' } = item;
+      
+      if (!articolo || !quantita) {
+        connection.release();
+        return res.status(400).json({ error: 'articolo and quantita are required for each item' });
+      }
+
+      const query = `
+        INSERT INTO movimenti_magazzino (articolo, quantita, causale, note, deposito, data)
+        VALUES (?, ?, ?, ?, ?, NOW())
+      `;
+
+      await connection.query(query, [articolo, quantita, causale, note, deposito]);
+    }
+
+    connection.release();
+    res.json({ success: true, message: 'Movimenti registrati con successo' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
