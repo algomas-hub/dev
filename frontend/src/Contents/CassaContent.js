@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import API_BASE_URL from '../config';
 import {
   Box,
   TextField,
@@ -80,7 +81,7 @@ function CassaContent() {
 
     try {
       const response = await fetch(
-        `/api/articoli/search?termine=${encodeURIComponent(termine)}`
+        `${API_BASE_URL}/api/articoli/search?termine=${encodeURIComponent(termine)}`
       );
 
       const data = await response.json();
@@ -336,7 +337,7 @@ function CassaContent() {
         note: item.quantita < 0 ? 'aggiornamento da preventivo - carico' : 'aggiornamento da preventivo - scarico',
       }));
 
-      const response = await fetch('/api/movimenti/registra', {
+      const response = await fetch(`${API_BASE_URL}/api/movimenti/registra`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
