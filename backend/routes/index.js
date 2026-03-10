@@ -304,6 +304,7 @@ router.get('/articoli/search', async (req, res) => {
       WHERE 
         a.codice LIKE ? OR
         a.descrizione LIKE ? OR
+        a.codice_a_barre LIKE ? OR
         a.codice_fornitore LIKE ? OR
         a.codice_fornitore2 LIKE ? OR
         a.codice_fornitore3 LIKE ? OR
@@ -313,7 +314,7 @@ router.get('/articoli/search', async (req, res) => {
       LIMIT 150
     `;
 
-    const [searchResults] = await connection.query(searchQuery, [firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm]);
+    const [searchResults] = await connection.query(searchQuery, [firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm]);
     
     if (searchResults.length === 0) {
       connection.release();

@@ -2,7 +2,6 @@ import { styled } from '@mui/material/styles';
 import MuiDrawer, { drawerClasses } from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -14,6 +13,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HomeIcon from '@mui/icons-material/Home';
 import LinkIcon from '@mui/icons-material/Link';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import Button from '@mui/material/Button';
 
 const drawerWidth = 200;
 
@@ -27,7 +28,7 @@ const Drawer = styled(MuiDrawer)({
   },
 });
 
-export default function SideMenu() {
+export default function SideMenu({ onLogout }) {
   const location = useLocation();
 
   const menuItems = [
@@ -114,11 +115,29 @@ export default function SideMenu() {
         </List>
       </Box>
       <Divider />
-      <Stack direction="row" sx={{ p: 2, gap: 1, alignItems: 'center' }}>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Button
+          variant="contained"
+          startIcon={<LogoutRoundedIcon />}
+          onClick={onLogout}
+          sx={{
+            background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
+            color: '#FFFFFF',
+            textTransform: 'none',
+            fontWeight: 600,
+            borderRadius: 0,
+            py: 1,
+            '&:hover': {
+              background: 'linear-gradient(135deg, #F57C00 0%, #E65100 100%)',
+            },
+          }}
+        >
+          Logout
+        </Button>
+        <Typography variant="caption" sx={{ color: 'text.secondary', textAlign: 'center', mt: 1 }}>
           © 2026 Airsoft 22
         </Typography>
-      </Stack>
+      </Box>
     </Drawer>
   );
 }

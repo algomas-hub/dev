@@ -1,5 +1,6 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Box, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Nav from './Nav/Nav';
@@ -8,6 +9,7 @@ import DashboardContent from './Contents/DashboardContent';
 import LinkContent from './Contents/LinkContent';
 import MagazzinoContent from './Contents/MagazzinoContent';
 import CassaContent from './Contents/CassaContent';
+import LoginPage from './pages/LoginPage';
 
 // Tema moderno come Material-UI Dashboard Template
 const theme = createTheme({
@@ -187,13 +189,48 @@ const theme = createTheme({
 });
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Controlla se l'utente è già autenticato (al montaggio)
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      setIsAuthenticated(true);
+    }
+    setLoading(false);
+  }, []);
+
+  // Gestisci il logout
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    setIsAuthenticated(false);
+  };
+
+  // Se in caricamento, mostra nulla
+  if (loading) {
+    return null;
+  }
+
+  // Se non autenticato, mostra la pagina di login
+  if (!isAuthenticated) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
+      </ThemeProvider>
+    );
+  }
+
+  // Se autenticato, mostra l'app
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
         <Box sx={{ display: 'flex' }}>
-          <SideMenu />
-          <Nav />
+          <SideMenu onLogout={handleLogout} />
+          <Nav onLogout={handleLogout} />
           {/* Main content */}
           <Box
             component="main"

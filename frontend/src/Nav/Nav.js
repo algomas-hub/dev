@@ -14,8 +14,9 @@ import {
 
 } from '@mui/material';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
-function Nav() {
+function Nav({ onLogout }) {
   const [mobileAnchor, setMobileAnchor] = useState(null);
 
   const handleMobileMenuOpen = (event) => {
@@ -73,6 +74,19 @@ function Nav() {
             <Button component={RouterLink} to="/magazzino" size="small">
               Magazzino
             </Button>
+            <IconButton
+              color="inherit"
+              onClick={onLogout}
+              title="Esci"
+              sx={{
+                ml: 2,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                }
+              }}
+            >
+              <LogoutRoundedIcon />
+            </IconButton>
           </Stack>
 
           <TextField
@@ -105,6 +119,15 @@ function Nav() {
             </MenuItem>
             <MenuItem component={RouterLink} to="/link" onClick={handleMobileMenuClose}>
               Link
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMobileMenuClose();
+                onLogout();
+              }
+              }
+            >
+              Esci
             </MenuItem>
           </Menu>
         </Toolbar>
