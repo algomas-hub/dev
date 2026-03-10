@@ -321,7 +321,7 @@ router.get('/articoli/search', async (req, res) => {
       return res.json({ success: true, data: [] });
     }
 
-    // Step 2: recupera dettagli per articoli trovati (senza movimenti per velocità)
+    // Step 2: recupera dettagli per articoli trovati con quantità basate su causale (come in magazzino)
     const codici = searchResults.map(r => r.codice);
     
     const detailsQuery = `
@@ -336,7 +336,7 @@ router.get('/articoli/search', async (req, res) => {
         a.codice_fornitore4,
         a.codice_fornitore5,
         a.codice_fornitore6,
-        0 as quantita_disponibile,
+        COALESCE(SUM(CASE WHEN m.causale = 3 THEN -m.quantita ELSE m.quantita END), 0) as quantita_disponibile,
         COALESCE(ap.prezzo, 0) as prezzo_originale,
         COALESCE(ap.sconto1, 0) as sconto1,
         COALESCE(ap.sconto2, 0) as sconto2,
@@ -345,8 +345,10 @@ router.get('/articoli/search', async (req, res) => {
           ELSE 0
         END as prezzo_scontato
       FROM articoli a
+      LEFT JOIN movimenti_magazzino m ON a.codice = m.articolo
       LEFT JOIN articoli_prezzi ap ON a.codice = ap.articolo AND ap.listino = 'BASE'
       WHERE a.codice IN (${codici.map(() => '?').join(',')})
+      GROUP BY a.codice, a.descrizione, a.colore, a.dimensioni, a.codice_fornitore, a.codice_fornitore2, a.codice_fornitore3, a.codice_fornitore4, a.codice_fornitore5, a.codice_fornitore6, ap.articolo, ap.listino, ap.prezzo, ap.sconto1, ap.sconto2
     `;
 
     const [rows] = await connection.query(detailsQuery, codici);

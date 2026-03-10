@@ -11,28 +11,28 @@ import MagazzinoContent from './Contents/MagazzinoContent';
 import CassaContent from './Contents/CassaContent';
 import LoginPage from './pages/LoginPage';
 
-// Tema moderno come Material-UI Dashboard Template
+// Tema moderno minimalista with light palette
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
     primary: {
-      main: '#00BCD4',
-    },
-    secondary: {
       main: '#FF9800',
     },
-    background: {
-      default: '#0D0D0D',
-      paper: '#1A1A1A',
+    secondary: {
+      main: '#00BCD4',
     },
-    divider: 'rgba(255, 255, 255, 0.1)',
+    background: {
+      default: '#FAFAFA',
+      paper: '#FFFFFF',
+    },
+    divider: '#e0e0e0',
     text: {
-      primary: '#FFFFFF',
-      secondary: '#BDBDBD',
+      primary: '#1A1A1A',
+      secondary: '#666666',
     },
     action: {
-      hover: 'rgba(255, 255, 255, 0.08)',
-      selected: 'rgba(0, 188, 212, 0.1)',
+      hover: 'rgba(0, 0, 0, 0.04)',
+      selected: 'rgba(255, 152, 0, 0.08)',
     },
   },
   typography: {
@@ -53,19 +53,20 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1A1A1A',
+          backgroundColor: '#FFFFFF',
           backgroundImage: 'none',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: 'none',
+          borderBottom: '1px solid #e0e0e0',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+          color: '#1A1A1A',
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#1A1A1A',
+          backgroundColor: '#FFFFFF',
           backgroundImage: 'none',
-          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRight: '1px solid #e0e0e0',
         },
       },
     },
@@ -82,10 +83,10 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1A1A1A',
+          backgroundColor: '#FFFFFF',
           backgroundImage: 'none',
-          boxShadow: 'none',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+          border: '1px solid #e0e0e0',
           transition: 'all 0.2s ease',
         },
       },
@@ -95,10 +96,10 @@ const theme = createTheme({
         root: {
           textTransform: 'none',
           fontWeight: 500,
-          borderRadius: 8,
+          borderRadius: 6,
         },
         contained: {
-          boxShadow: 'none',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         },
       },
     },
@@ -106,17 +107,17 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            backgroundColor: '#262626',
+            backgroundColor: '#FFFFFF',
             borderRadius: 6,
             transition: 'all 0.2s ease',
             '& fieldset': {
-              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: '#d0d0d0',
             },
             '&:hover fieldset': {
-              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor: '#999999',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#FFFFFF',
+              borderColor: '#FF9800',
               borderWidth: 1,
             },
             '&::after': {
@@ -129,9 +130,9 @@ const theme = createTheme({
             },
           },
           '& .MuiInputBase-input': {
-            color: '#FFFFFF',
+            color: '#1A1A1A',
             '&::placeholder': {
-              color: 'rgba(255, 255, 255, 0.5)',
+              color: 'rgba(0, 0, 0, 0.4)',
               opacity: 1,
             },
           },
@@ -149,13 +150,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderColor: '#d0d0d0',
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.2)',
+            borderColor: '#999999',
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#FFFFFF',
+            borderColor: '#FF9800',
             borderWidth: 1,
           },
         },
@@ -164,12 +165,12 @@ const theme = createTheme({
     MuiInputBase: {
       styleOverrides: {
         root: {
-          color: '#FFFFFF',
+          color: '#1A1A1A',
         },
         input: {
-          color: '#FFFFFF',
+          color: '#1A1A1A',
           '&::placeholder': {
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: 'rgba(0, 0, 0, 0.4)',
             opacity: 1,
           },
         },
@@ -178,9 +179,9 @@ const theme = createTheme({
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          color: 'rgba(255, 255, 255, 0.7)',
+          color: 'rgba(0, 0, 0, 0.6)',
           '&.Mui-focused': {
-            color: '#FFFFFF',
+            color: '#FF9800',
           },
         },
       },
@@ -191,6 +192,7 @@ const theme = createTheme({
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Controlla se l'utente è già autenticato (al montaggio)
   useEffect(() => {
@@ -229,7 +231,7 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <Box sx={{ display: 'flex' }}>
-          <SideMenu onLogout={handleLogout} />
+          <SideMenu onLogout={handleLogout} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
           <Nav onLogout={handleLogout} />
           {/* Main content */}
           <Box

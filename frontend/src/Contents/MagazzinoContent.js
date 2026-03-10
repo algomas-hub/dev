@@ -211,7 +211,7 @@ function MagazzinoContent() {
             />
         </Box>
         {searchTermine && (
-          <Typography variant="body2" sx={{ color: '#81C784', fontStyle: 'italic' }}>
+          <Typography variant="body2" sx={{ color: '#FF9800', fontStyle: 'italic' }}>
             ✓ Ricerca attiva: "<strong>{searchTermine}</strong>"
           </Typography>
         )}
@@ -234,13 +234,13 @@ function MagazzinoContent() {
       {/* Tabella Movimenti */}
       {!loading && !error && (
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, color: '#90caf9', fontWeight: 'bold' }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, color: '#FF9800', fontWeight: 'bold' }}>
             📋 Trovati {movimenti.length} movimenti
           </Typography>
 
           {movimenti.length > 0 ? (
             <Box sx={{ flex: 1, overflow: 'auto' }}>
-              {getArticoliPaginati().map(([articolo, movimentiArticolo]) => {
+          {getArticoliPaginati().map(([articolo, movimentiArticolo]) => {
                 const totaleArticolo = getTotalePerArticolo(movimentiArticolo);
                 const descrizione = (movimentiArticolo[0]?.descrizione || '-').replace(/\[.*?\]/g, '').trim().toUpperCase();
                 const marca = String(movimentiArticolo[0]?.marca_estratto || movimentiArticolo[0]?.fornitore || '-');
@@ -251,8 +251,8 @@ function MagazzinoContent() {
                     key={articolo} 
                     sx={{ 
                       mb: 2, 
-                      backgroundColor: '#1e1e1e',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+                      backgroundColor: '#FFFFFF',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                       '&:before': {
                         display: 'none',
                       },
@@ -261,20 +261,20 @@ function MagazzinoContent() {
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                       sx={{ 
-                        backgroundColor: '#2a2a2a',
+                        backgroundColor: '#f5f5f5',
                         fontWeight: 'bold',
-                        borderBottom: '1px solid #3a3a3a',
+                        borderBottom: '1px solid #e0e0e0',
                         '&:hover': {
-                          backgroundColor: '#333333',
+                          backgroundColor: '#eeeeee',
                         },
                       }}
                     >
                       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', width: '100%', justifyContent: 'space-between', flexWrap: 'nowrap', overflowX: 'auto' }}>
-                        <Typography sx={{ fontWeight: 'bold', color: '#64B5F6', minWidth: '100px', whiteSpace: 'nowrap' }}>
+                        <Typography sx={{ fontWeight: 'bold', color: '#FF9800', minWidth: '100px', whiteSpace: 'nowrap' }}>
                           📦 {articolo}
                         </Typography>
                         <Typography sx={{ 
-                          color: '#b0bec5', 
+                          color: '#666666', 
                           fontSize: '0.85rem',
                           maxWidth: '350px',
                           wordBreak: 'break-word',
@@ -284,35 +284,38 @@ function MagazzinoContent() {
                         }}>
                           {descrizione}
                         </Typography>
-                        <Typography sx={{ color: '#90caf9', minWidth: '110px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                        <Typography sx={{ color: '#FF9800', minWidth: '110px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
                           Marca: {marca.toUpperCase()}
                         </Typography>
-                        <Typography sx={{ color: '#90caf9', minWidth: '120px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                        <Typography sx={{ color: '#FF9800', minWidth: '120px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
                           Colore: {colore.toUpperCase()}
                         </Typography>
-                        <Typography sx={{ color: '#90caf9', minWidth: '80px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                        <Typography sx={{ color: '#FF9800', minWidth: '80px', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
                           Taglia: {taglia.toUpperCase()}
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '110px', whiteSpace: 'nowrap' }}>
-                          <Typography sx={{ fontWeight: 'bold', color: '#64B5F6', fontSize: '18px' }}>
+                          <Typography sx={{ fontWeight: 'bold', color: '#FF9800', fontSize: '18px' }}
+                            >
                             {totaleArticolo > 0 ? '+' : ''}{Math.round(totaleArticolo)} pz
                           </Typography>
                         </Box>
-                        <Typography variant="body2" sx={{ color: '#90caf9', minWidth: '80px', textAlign: 'right' }}>
+                        <Typography variant="body2" sx={{ color: '#FF9800', minWidth: '80px', textAlign: 'right' }}>
                           ({movimentiArticolo.length} mov.)
                         </Typography>
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ p: 0 }}>
-                      <TableContainer sx={{ backgroundColor: 'rgba(26, 26, 26, 0.8)', maxHeight: '500px', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }}>
-                        <Table stickyHeader sx={{ tableLayout: 'fixed' }}>
+                      <Box sx={{ backgroundColor: '#FFFFFF', maxHeight: '500px', border: '1px solid #e0e0e0', borderRadius: '8px', overflowX: 'auto' }}>
+                        <TableContainer sx={{ minWidth: 'max-content' }}>
+                          <Table stickyHeader sx={{ tableLayout: 'auto' }}>
                           <TableHead>
-                            <TableRow sx={{ backgroundColor: '#262626', height: '50px' }}>
+                            <TableRow sx={{ backgroundColor: '#f5f5f5', height: '50px' }}>
                               <TableCell sx={{ 
                                 fontWeight: '600', 
-                                color: '#fff',
+                                color: '#333333',
                                 borderBottom: 'none',
                                 width: '80px',
+                                minWidth: '80px',
                                 padding: '16px 12px',
                                 textAlign: 'left',
                                 fontSize: '0.9rem',
@@ -320,9 +323,10 @@ function MagazzinoContent() {
                               }}>ID</TableCell>
                               <TableCell sx={{ 
                                 fontWeight: '600', 
-                                color: '#fff',
+                                color: '#333333',
                                 borderBottom: 'none',
                                 width: '130px',
+                                minWidth: '130px',
                                 padding: '16px 12px',
                                 textAlign: 'center',
                                 fontSize: '0.9rem',
@@ -330,9 +334,10 @@ function MagazzinoContent() {
                               }}>Quantità</TableCell>
                               <TableCell sx={{ 
                                 fontWeight: '600', 
-                                color: '#fff',
+                                color: '#333333',
                                 borderBottom: 'none',
                                 width: '150px',
+                                minWidth: '150px',
                                 padding: '16px 12px',
                                 textAlign: 'center',
                                 fontSize: '0.9rem',
@@ -340,9 +345,10 @@ function MagazzinoContent() {
                               }}>Causale</TableCell>
                               <TableCell sx={{ 
                                 fontWeight: '600', 
-                                color: '#fff',
+                                color: '#333333',
                                 borderBottom: 'none',
                                 width: '140px',
+                                minWidth: '140px',
                                 padding: '16px 12px',
                                 textAlign: 'center',
                                 fontSize: '0.9rem',
@@ -355,18 +361,19 @@ function MagazzinoContent() {
                               <TableRow
                                 key={index}
                                 sx={{
-                                  backgroundColor: index % 2 === 0 ? '#1e1e1e' : '#252525',
-                                  borderBottom: '1px solid #333333',
-                                  '&:hover': { backgroundColor: '#2a2a3e' },
+                                  backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#f9f9f9',
+                                  borderBottom: '1px solid #e0e0e0',
+                                  '&:hover': { backgroundColor: '#f0f0f0' },
                                   height: '55px'
                                 }}
                               >
                                 <TableCell sx={{ 
-                                  color: '#90caf9', 
+                                  color: '#FF9800', 
                                   fontWeight: '500', 
                                   padding: '12px',
                                   fontSize: '0.9rem',
                                   width: '80px',
+                                  minWidth: '80px',
                                   textAlign: 'left',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis'
@@ -376,6 +383,7 @@ function MagazzinoContent() {
                                 <TableCell sx={{ 
                                   padding: '12px',
                                   width: '130px',
+                                  minWidth: '130px',
                                   textAlign: 'center'
                                 }}>
                                   <span style={{ 
@@ -389,6 +397,7 @@ function MagazzinoContent() {
                                 <TableCell sx={{ 
                                   padding: '12px',
                                   width: '150px',
+                                  minWidth: '150px',
                                   textAlign: 'center'
                                 }}>
                                   <span style={{ 
@@ -409,6 +418,7 @@ function MagazzinoContent() {
                                   padding: '12px', 
                                   fontSize: '0.9rem',
                                   width: '140px',
+                                  minWidth: '140px',
                                   textAlign: 'center'
                                 }}>
                                   {movimento.data || movimento.date ? new Date(movimento.data || movimento.date).toLocaleDateString('it-IT') : '—'}
@@ -417,14 +427,14 @@ function MagazzinoContent() {
                             ))}
                             {/* Riga di Totale per Articolo */}
                             <TableRow sx={{ 
-                              backgroundColor: '#1a3a1a', 
-                              borderTop: '2px solid #2e7d32',
+                              backgroundColor: '#FFF8F0', 
+                              borderTop: '2px solid #FF9800',
                               fontWeight: 'bold',
                               height: '55px'
                             }}>
                               <TableCell sx={{ 
                                 fontWeight: 'bold', 
-                                color: '#81C784',
+                                color: '#FF9800',
                                 padding: '12px',
                                 fontSize: '0.95rem',
                                 width: '80px',
@@ -439,7 +449,7 @@ function MagazzinoContent() {
                               }}>
                                 <span style={{ 
                                   fontWeight: 'bold', 
-                                  color: totaleArticolo < 0 ? '#ff6b6b' : '#81C784', 
+                                  color: totaleArticolo < 0 ? '#d32f2f' : '#FF9800', 
                                   fontSize: '1rem'
                                 }}>
                                   {totaleArticolo > 0 ? '+' : ''}{Math.round(totaleArticolo)} pz
@@ -450,7 +460,8 @@ function MagazzinoContent() {
                             </TableRow>
                           </TableBody>
                         </Table>
-                      </TableContainer>
+                        </TableContainer>
+                      </Box>
                       {/* Paginazione */}
                       {getPageCount(movimentiArticolo) > 1 && (
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, py: 2 }}>
@@ -461,15 +472,15 @@ function MagazzinoContent() {
                             color="primary"
                             sx={{
                               '& .MuiPaginationItem-root': {
-                                color: '#64B5F6',
-                                borderColor: '#64B5F6',
+                                color: '#FF9800',
+                                borderColor: '#FF9800',
                               },
                               '& .MuiPaginationItem-page.Mui-selected': {
-                                backgroundColor: '#64B5F6',
-                                color: '#000',
+                                backgroundColor: '#FF9800',
+                                color: '#fff',
                               },
                               '& .MuiPaginationItem-page:hover': {
-                                backgroundColor: 'rgba(100, 181, 246, 0.1)',
+                                backgroundColor: 'rgba(255, 152, 0, 0.1)',
                               },
                             }}
                           />
@@ -491,15 +502,15 @@ function MagazzinoContent() {
                     size="large"
                     sx={{
                       '& .MuiPaginationItem-root': {
-                        color: '#64B5F6',
-                        borderColor: '#64B5F6',
+                        color: '#FF9800',
+                        borderColor: '#FF9800',
                       },
                       '& .MuiPaginationItem-page.Mui-selected': {
-                        backgroundColor: '#64B5F6',
-                        color: '#000',
+                        backgroundColor: '#FF9800',
+                        color: '#fff',
                       },
                       '& .MuiPaginationItem-page:hover': {
-                        backgroundColor: 'rgba(100, 181, 246, 0.1)',
+                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
                       },
                     }}
                   />
@@ -507,12 +518,12 @@ function MagazzinoContent() {
               )}
 
               {/* Riga di Riepilogo Generale */}
-              <Paper sx={{ p: 3, backgroundColor: '#2a2a2a', mt: 3, boxShadow: '0 6px 24px rgba(100, 181, 246, 0.2)', border: '2px solid #64B5F6' }}>
+              <Paper sx={{ p: 3, backgroundColor: '#FFF8F0', mt: 3, boxShadow: '0 2px 8px rgba(255, 152, 0, 0.15)', border: '2px solid #FF9800' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontWeight: 'bold', fontSize: '18px', color: '#64B5F6' }}>
+                  <Typography sx={{ fontWeight: 'bold', fontSize: '18px', color: '#FF9800' }}>
                     💰 TOTALE GENERALE:
                   </Typography>
-                  <span style={{ fontWeight: 'bold', color: getTotaleQuantita() < 0 ? '#ff6b6b' : '#81C784', fontSize: '22px' }}>
+                  <span style={{ fontWeight: 'bold', color: getTotaleQuantita() < 0 ? '#d32f2f' : '#FF9800', fontSize: '22px' }}>
                     {getTotaleQuantita() > 0 ? '+' : ''}{Math.round(getTotaleQuantita())} pz
                   </span>
                 </Box>

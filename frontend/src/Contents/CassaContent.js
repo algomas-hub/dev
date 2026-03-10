@@ -25,6 +25,10 @@ import {
   Checkbox,
   Chip,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
@@ -46,6 +50,7 @@ function CassaContent() {
   const [openToast, setOpenToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastSeverity, setToastSeverity] = useState('success');
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   // Ordinamento multiplo: array di {column, order}
   const [sortCriteria, setSortCriteria] = useState([{ column: 'codice', order: 'asc' }]);
   const [sortCriteriaSelected] = useState([{ column: 'codice', order: 'asc' }]);
@@ -200,14 +205,14 @@ function CassaContent() {
           }}
           sx={{
             '& .MuiTableSortLabel-icon': {
-              color: '#fff !important',
+              color: '#FF9800 !important',
               width: '14px',
               height: '14px',
             },
             '&.Mui-active': {
-              color: '#fff',
+              color: '#FF9800',
             },
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: '#FF9800',
             '&:hover': {
               color: '#fff',
             },
@@ -318,12 +323,17 @@ function CassaContent() {
   };
 
   // Registra movimenti
-  const handleAggiorna = async () => {
+  const handleAggiorna = () => {
     if (articoliSelezionati.length === 0) {
       setError('Aggiungi almeno un articolo');
       return;
     }
+    // Mostra il dialog di conferma
+    setOpenConfirmDialog(true);
+  };
 
+  const handleConfirmVendita = async () => {
+    setOpenConfirmDialog(false);
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -428,10 +438,11 @@ function CassaContent() {
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#64B5F6', fontSize: '0.85rem' }}>
                       📋 Risultati Ricerca ({articoliRicerca.length})
                     </Typography>
-                    <TableContainer sx={{ borderRadius: 1, border: '1px solid rgba(255, 255, 255, 0.1)', flex: 1, overflow: 'auto', maxHeight: 'calc(100vh - 80px)', backgroundColor: '#1A1A1A' }}>
-                      <Table stickyHeader>
+                    <Box sx={{ borderRadius: 1, border: '1px solid #e0e0e0', flex: 1, overflow: 'auto', maxHeight: 'calc(100vh - 80px)', backgroundColor: '#FFFFFF', overflowX: 'auto' }}>
+                      <TableContainer sx={{ minWidth: 'max-content' }}>
+                        <Table stickyHeader>
                         <TableHead>
-                          <TableRow sx={{ backgroundColor: '#262626', height: '40px' }}>
+                          <TableRow sx={{ backgroundColor: '#f5f5f5', height: '40px' }}>
                             <TableCell sx={{ 
                               fontWeight: '600', 
                               fontSize: '0.7rem', 
@@ -450,14 +461,14 @@ function CassaContent() {
                             <TableCell sx={{ 
                               fontWeight: '600', 
                               fontSize: '0.7rem', 
-                              color: '#fff',
+                              color: '#333333',
                               padding: '4px 6px',
                               letterSpacing: '0px',
                               flex: 1,
                               cursor: 'pointer',
                               userSelect: 'none',
                               '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                backgroundColor: '#eeeeee',
                               }
                             }}>
                               {renderHeaderWithCheckbox('descrizione', 'Desc', sortCriteria, setSortCriteria, handleSort)}
@@ -480,14 +491,15 @@ function CassaContent() {
                             <TableCell sx={{ 
                               fontWeight: '600', 
                               fontSize: '0.7rem', 
-                              color: '#FF9800',
+                              color: '#333333',
                               padding: '4px 6px',
                               letterSpacing: '0px',
                               width: '60px',
+                              minWidth: '60px',
                               cursor: 'pointer',
                               userSelect: 'none',
                               '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                backgroundColor: '#eeeeee',
                               }
                             }}>
                               {renderHeaderWithCheckbox('taglia', 'Tag', sortCriteria, setSortCriteria, handleSort)}
@@ -495,15 +507,16 @@ function CassaContent() {
                             <TableCell sx={{ 
                               fontWeight: '600', 
                               fontSize: '0.7rem', 
-                              color: '#fff',
+                              color: '#333333',
                               padding: '4px 6px',
                               letterSpacing: '0px',
                               width: '70px',
+                              minWidth: '70px',
                               textAlign: 'center',
                               cursor: 'pointer',
                               userSelect: 'none',
                               '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                backgroundColor: '#eeeeee',
                               }
                             }}>
                               {renderHeaderWithCheckbox('magazzino', 'Mag', sortCriteria, setSortCriteria, handleSort)}
@@ -511,19 +524,21 @@ function CassaContent() {
                             <TableCell sx={{ 
                               fontWeight: '600', 
                               fontSize: '0.7rem', 
-                              color: '#fff',
+                              color: '#333333',
                               padding: '4px 6px',
                               letterSpacing: '0px',
                               width: '80px',
+                              minWidth: '80px',
                               textAlign: 'right'
                             }}>Prezzo</TableCell>
                             <TableCell sx={{ 
                               fontWeight: '600', 
                               fontSize: '0.7rem', 
-                              color: '#fff',
+                              color: '#333333',
                               padding: '4px 6px',
                               letterSpacing: '0px',
                               width: '60px',
+                              minWidth: '60px',
                               textAlign: 'center'
                             }}>Act</TableCell>
                           </TableRow>
@@ -533,45 +548,45 @@ function CassaContent() {
                             <TableRow 
                               key={articolo.codice}
                               sx={{ 
-                                backgroundColor: index % 2 === 0 ? '#1e1e1e' : '#252525',
+                                backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#f9f9f9',
                                 '&:hover': {
-                                  backgroundColor: '#2a2a3e',
+                                  backgroundColor: '#f0f0f0',
                                 },
-                                borderBottom: '1px solid #333333',
+                                borderBottom: '1px solid #e0e0e0',
                                 height: 'auto',
-                                minHeight: '50px'
+                                minHeight: '40px'
                               }}
                             >
-                              <TableCell sx={{ fontSize: '0.8rem', fontWeight: '600', color: '#FF9800', padding: '12px', textAlign: 'left' }}>
+                              <TableCell sx={{ fontSize: '0.7rem', fontWeight: '600', color: '#333333', padding: '8px', textAlign: 'left' }}>
                                 {articolo.codice}
                               </TableCell>
-                              <TableCell sx={{ fontSize: '0.75rem', color: '#e0e0e0', padding: '12px' }}>
+                              <TableCell sx={{ fontSize: '0.65rem', color: '#333333', padding: '8px' }}>
                                 <Tooltip title={articolo.descrizione.replace(/\[.*?\]/g, '').trim().toUpperCase()} arrow>
                                   <Box sx={{ 
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    maxWidth: '200px'
+                                    maxWidth: '220px'
                                   }}>
                                     {articolo.descrizione.replace(/\[.*?\]/g, '').trim().toUpperCase()}
                                   </Box>
                                 </Tooltip>
                               </TableCell>
-                              <TableCell sx={{ fontSize: '0.8rem', color: '#FF9800', padding: '12px', fontWeight: '500' }}>
+                              <TableCell sx={{ fontSize: '0.7rem', color: '#FF9800', padding: '8px', fontWeight: '500' }}>
                                 {(articolo.colore_estratto || articolo.colore || '—').toUpperCase()}
                               </TableCell>
-                              <TableCell sx={{ fontSize: '0.8rem', color: '#FF9800', padding: '12px', fontWeight: '500' }}>
+                              <TableCell sx={{ fontSize: '0.7rem', color: '#FF9800', padding: '8px', fontWeight: '500' }}>
                                 {(articolo.taglia_estratta || articolo.dimensioni || '—').toUpperCase()}
                               </TableCell>
-                              <TableCell sx={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#81C784', padding: '12px', textAlign: 'center' }}>
+                              <TableCell sx={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#81C784', padding: '8px', textAlign: 'center' }}>
                                 {articolo.quantita_disponibile}
                               </TableCell>
-                              <TableCell sx={{ fontSize: '0.75rem', color: '#FFD54F', padding: '8px 4px', textAlign: 'right' }}>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <TableCell sx={{ fontSize: '0.65rem', color: '#FF9800', padding: '6px 4px', textAlign: 'right' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                                   {articolo.prezzo_originale && articolo.prezzo_originale > 0 ? (
                                     (articolo.sconto1 > 0 || articolo.sconto2 > 0) && articolo.prezzo_scontato && articolo.prezzo_scontato < articolo.prezzo_originale ? (
                                       <>
-                                        <Box sx={{ textDecoration: 'line-through', color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.65rem' }}>
+                                        <Box sx={{ textDecoration: 'line-through', color: '#999999', fontSize: '0.6rem' }}>
                                           €{parseFloat(articolo.prezzo_originale).toFixed(2)}
                                         </Box>
                                         <Box sx={{ fontWeight: 'bold', color: '#4CAF50' }}>
@@ -582,43 +597,48 @@ function CassaContent() {
                                       <Box>€{parseFloat(articolo.prezzo_originale).toFixed(2)}</Box>
                                     )
                                   ) : (
-                                    <Box sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.65rem' }}>—</Box>
+                                    <Box sx={{ color: '#999999', fontSize: '0.6rem' }}>—</Box>
                                   )}
                                 </Box>
                               </TableCell>
-                              <TableCell sx={{ padding: '8px 4px', textAlign: 'center' }}>
+                              <TableCell sx={{ padding: '6px 4px', textAlign: 'center' }}>
                                 <Button
                                   size="small"
                                   variant="contained"
                                   color="secondary"
-                                  startIcon={<AddCircleRoundedIcon />}
                                   onClick={() => handleAggiungi(articolo)}
                                   sx={{ 
                                     textTransform: 'none',
                                     fontWeight: '600',
-                                    fontSize: '0.7rem',
-                                    padding: '6px 12px',
+                                    padding: '5px',
+                                    minWidth: '32px',
+                                    width: '32px',
+                                    height: '32px',
                                     borderRadius: 0,
-                                    background: 'linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
                                     transition: 'all 0.3s ease',
-                                    boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+                                    boxShadow: '0 3px 10px rgba(255, 152, 0, 0.3)',
                                     '&:hover': {
-                                      transform: 'translateY(-2px)',
-                                      boxShadow: '0 8px 20px rgba(76, 175, 80, 0.5)'
+                                      transform: 'translateY(-1px)',
+                                      boxShadow: '0 5px 15px rgba(255, 152, 0, 0.4)'
                                     },
                                     '&:active': {
                                       transform: 'translateY(0)'
                                     }
                                   }}
                                 >
-                                  Aggiungi
+                                  <AddCircleRoundedIcon sx={{ fontSize: '1rem' }} />
                                 </Button>
                               </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                       </Table>
-                    </TableContainer>
+                      </TableContainer>
+                    </Box>
                   </CardContent>
                 </Card>
               )}
@@ -627,19 +647,20 @@ function CassaContent() {
             {/* Colonna destra: Articoli selezionati */}
             <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', pb: 1, p: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#81C784', fontSize: '0.85rem' }}>
+                <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', pb: 0.5, p: 0.75 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#FF9800', fontSize: '0.8rem' }}>
                       🛒 Articoli da Vendere
                     </Typography>
                     <Chip
                       label={articoliSelezionati.length}
                       size="small"
                       sx={{
-                        backgroundColor: '#81C784',
-                        color: '#fff',
+                        backgroundColor: '#FF9800',
+                        color: '#000',
                         fontWeight: 'bold',
-                        height: '24px',
+                        height: '20px',
+                        minWidth: '28px',
                       }}
                     />
                   </Box>
@@ -647,78 +668,74 @@ function CassaContent() {
                   {articoliSelezionati.length === 0 ? (
                     <Box sx={{ 
                       textAlign: 'center', 
-                      py: 4,
+                      py: 2,
                       color: '#666',
-                      fontSize: '0.85rem'
+                      fontSize: '0.75rem'
                     }}>
                       Seleziona articoli dalla ricerca →
                     </Box>
                   ) : (
                     <>
-                      <TableContainer sx={{ mb: 1, borderRadius: 1, border: '1px solid #333333', overflow: 'visible' }}>
-                        <Table>
-                          <TableHead>
-                            <TableRow sx={{ backgroundColor: '#1a3a1a' }}>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px' }}>
-                                Cod
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px', flex: 1 }}>
-                                Desc
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px', width: '60px', textAlign: 'center' }}>
-                                Col
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px', width: '50px', textAlign: 'center' }}>
-                                Tag
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px', width: '50px', textAlign: 'center' }}>
-                                Qtà
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px', width: '80px', textAlign: 'right' }}>
-                                Prezzo
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 'bold', fontSize: '0.7rem', color: '#81C784', borderBottom: '2px solid #2e7d32', padding: '3px 4px', width: '40px', textAlign: 'center' }}>
-                                ❌
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {articoliSelezionatiOrdinati.map((articolo, index) => (
-                              <TableRow 
-                                key={articolo.codice}
-                                sx={{ 
-                                  backgroundColor: index % 2 === 0 ? '#1e1e1e' : '#252525',
-                                  '&:hover': {
-                                    backgroundColor: '#2a3a2a',
-                                    transition: 'all 0.2s ease',
-                                  },
-                                  borderBottom: '1px solid #333333',
-                                  height: '35px'
-                                }}
-                              >
-                                <TableCell sx={{ fontSize: '0.8rem', fontWeight: '500', color: '#81C784', padding: '8px 12px' }}>
-                                  {articolo.codice}
-                                </TableCell>
-                                <TableCell sx={{ fontSize: '0.75rem', color: '#e0e0e0', padding: '8px 12px', wordBreak: 'break-word', whiteSpace: 'normal', lineHeight: '1.3' }}>
+                      <Box sx={{ mb: 0.5, borderRadius: 1, border: '1px solid #e0e0e0' }}>
+                        <Grid container spacing={0.5} sx={{ p: 0.5 }}>
+                          {articoliSelezionatiOrdinati.map((articolo) => (
+                            <Grid item xs={12} sm={6} md={4} key={articolo.codice}>
+                              <Box sx={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: 0.5,
+                                p: 0.75,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 0.5,
+                                minHeight: '68px',
+                                '&:hover': {
+                                  backgroundColor: '#f9f9f9',
+                                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                                  transition: 'all 0.2s ease',
+                                }
+                              }}>
+                                {/* Riga 1: Codice e Delete */}
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <Box sx={{ fontSize: '0.65rem', fontWeight: '500', color: '#FF9800' }}>
+                                    {articolo.codice}
+                                  </Box>
+                                  <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => handleRimuovi(articolo.codice)}
+                                    sx={{
+                                      p: '2px',
+                                      '&:hover': {
+                                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                                      }
+                                    }}
+                                  >
+                                    <DeleteRoundedIcon sx={{ fontSize: '0.9rem' }} />
+                                  </IconButton>
+                                </Box>
+                                
+                                {/* Riga 2: Descrizione */}
+                                <Box sx={{ fontSize: '0.75rem', color: '#333333', lineHeight: '1.3', whiteSpace: 'normal', flex: 1 }}>
                                   {articolo.descrizione.replace(/\[.*?\]/g, '').trim().toUpperCase()}
-                                </TableCell>
-                                <TableCell sx={{ fontSize: '0.75rem', color: '#90caf9', padding: '8px 12px', textAlign: 'center' }}>
-                                  {(articolo.colore_estratto || articolo.colore || '—').toUpperCase()}
-                                </TableCell>
-                                <TableCell sx={{ fontSize: '0.75rem', color: '#90caf9', padding: '8px 12px', textAlign: 'center' }}>
-                                  {(articolo.taglia_estratta || articolo.dimensioni || '—').toUpperCase()}
-                                </TableCell>
-                                <TableCell align="center" sx={{ padding: '8px' }}>
+                                </Box>
+                                
+                                {/* Riga 3: Colore, Qtà, Prezzo */}
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 0.4 }}>
+                                  <Box sx={{ fontSize: '0.6rem', color: '#555555', minWidth: '40px' }}>
+                                    {(articolo.colore_estratto || articolo.colore || '—').toUpperCase()}
+                                  </Box>
+                                  
                                   <ButtonGroup size="small" variant="outlined" sx={{
                                     '& .MuiButton-root': {
                                       borderRadius: 0,
-                                      border: '1.5px solid #00BCD4',
-                                      color: '#00BCD4',
+                                      border: '1px solid #FF9800',
+                                      color: '#FF9800',
                                       transition: 'all 0.3s ease',
+                                      fontSize: '0.65rem',
                                       '&:hover': {
-                                        backgroundColor: 'rgba(0, 188, 212, 0.1)',
-                                        borderColor: '#00ACC1',
-                                        boxShadow: '0 4px 12px rgba(0, 188, 212, 0.2)'
+                                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                                        borderColor: '#F57C00',
                                       }
                                     }
                                   }}>
@@ -731,20 +748,21 @@ function CassaContent() {
                                           nuovaQuantita === 0 ? -1 : nuovaQuantita
                                         );
                                       }}
-                                      sx={{ minWidth: '32px', p: '4px' }}
+                                      sx={{ minWidth: '24px', p: '1px' }}
                                     >
-                                      <RemoveCircleRoundedIcon sx={{ fontSize: '1rem' }} />
+                                      <RemoveCircleRoundedIcon sx={{ fontSize: '0.7rem' }} />
                                     </Button>
                                     <Button
                                       disabled
                                       size="small"
                                       sx={{
-                                        minWidth: '50px',
-                                        fontSize: '0.75rem',
+                                        minWidth: '28px',
+                                        fontSize: '0.55rem',
                                         fontWeight: 'bold',
-                                        color: '#fff',
+                                        color: '#333333',
+                                        py: '1px',
                                         '&.Mui-disabled': {
-                                          color: '#fff',
+                                          color: '#333333',
                                         }
                                       }}
                                     >
@@ -759,79 +777,53 @@ function CassaContent() {
                                           nuovaQuantita === 0 ? 1 : nuovaQuantita
                                         );
                                       }}
-                                      sx={{ minWidth: '32px', p: '4px' }}
+                                      sx={{ minWidth: '24px', p: '1px' }}
                                     >
-                                      <AddCircleRoundedIcon sx={{ fontSize: '1rem' }} />
+                                      <AddCircleRoundedIcon sx={{ fontSize: '0.7rem' }} />
                                     </Button>
                                   </ButtonGroup>
-                                </TableCell>
-                                <TableCell sx={{ fontSize: '0.75rem', color: '#FFD54F', padding: '8px 4px', textAlign: 'right' }}>
-                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'flex-end' }}>
-                                    {articolo.prezzo_originale && articolo.prezzo_originale > 0 ? (
-                                      (articolo.sconto1 > 0 || articolo.sconto2 > 0) && articolo.prezzo_scontato && articolo.prezzo_scontato < articolo.prezzo_originale ? (
-                                        <>
-                                          <Box sx={{ textDecoration: 'line-through', color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.65rem' }}>
-                                            €{(parseFloat(articolo.prezzo_originale) * articolo.quantita).toFixed(2)}
-                                          </Box>
-                                          <Box sx={{ fontWeight: 'bold', color: '#4CAF50' }}>
-                                            €{(parseFloat(articolo.prezzo_scontato) * articolo.quantita).toFixed(2)}
-                                          </Box>
-                                        </>
-                                      ) : (
-                                        <Box>€{(parseFloat(articolo.prezzo_originale) * articolo.quantita).toFixed(2)}</Box>
-                                      )
+                                  
+                                  <Box sx={{ minWidth: '55px', fontSize: '0.6rem', color: '#FF9800', textAlign: 'right', fontWeight: 'bold' }}>
+                                    {articolo.prezzo_scontato && articolo.prezzo_scontato < articolo.prezzo_originale ? (
+                                      <Box>€{(parseFloat(articolo.prezzo_scontato) * articolo.quantita).toFixed(2)}</Box>
                                     ) : (
-                                      <Box sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.65rem' }}>—</Box>
+                                      <Box>€{(parseFloat(articolo.prezzo_originale || 0) * articolo.quantita).toFixed(2)}</Box>
                                     )}
                                   </Box>
-                                </TableCell>
-                                <TableCell align="center" sx={{ padding: '8px' }}>
-                                  <IconButton
-                                    size="small"
-                                    color="error"
-                                    onClick={() =>
-                                      handleRimuovi(articolo.codice)
-                                    }
-                                    sx={{
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                                      }
-                                    }}
-                                  >
-                                    <DeleteRoundedIcon sx={{ fontSize: '1.2rem' }} />
-                                  </IconButton>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
+                                </Box>
+                              </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
 
                       <Box sx={{ 
-                        p: 2.5,
-                        mb: 2,
-                        border: '3px solid #4CAF50',
+                        p: 1.5,
+                        mb: 1,
+                        border: '3px solid #FF9800',
                         textAlign: 'center',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 1
+                        gap: 0.5,
+                        backgroundColor: '#FFF8F0',
+                        borderRadius: 1
                       }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <MonetizationOnRoundedIcon sx={{ fontSize: '1.5rem', color: '#FFD54F' }} />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <MonetizationOnRoundedIcon sx={{ fontSize: '1.2rem', color: '#FF9800' }} />
                           <Typography sx={{ 
-                            fontSize: '1rem', 
-                            color: '#FFD54F', 
+                            fontSize: '0.9rem', 
+                            color: '#FF9800', 
                             fontWeight: 'bold'
                           }}>
                             TOTALE DA PAGARE
                           </Typography>
                         </Box>
                         <Typography sx={{ 
-                          fontSize: '2.2rem', 
-                          color: '#4CAF50', 
+                          fontSize: '1.9rem', 
+                          color: '#FF9800', 
                           fontWeight: '900',
-                          letterSpacing: '1px'
+                          letterSpacing: '0.5px'
                         }}>
                           €{articoliSelezionatiOrdinati.reduce((total, articolo) => {
                             const prezzo = articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato) : parseFloat(articolo.prezzo_originale || 0);
@@ -848,8 +840,8 @@ function CassaContent() {
                         onClick={handleAggiorna}
                         disabled={loading}
                         sx={{
-                          py: 1.2,
-                          fontSize: '0.9rem',
+                          py: 0.8,
+                          fontSize: '0.8rem',
                           fontWeight: 'bold',
                           textTransform: 'none',
                           borderRadius: 0,
@@ -867,8 +859,8 @@ function CassaContent() {
                             transform: 'translateY(0)'
                           },
                           '&:disabled': {
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            color: 'rgba(255, 255, 255, 0.5)',
+                            background: '#e0e0e0',
+                            color: '#999999',
                             boxShadow: 'none',
                             transform: 'none'
                           }
@@ -888,6 +880,147 @@ function CassaContent() {
           </Grid>
         </Stack>
       </Box>
+      
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => setOpenConfirmDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 1,
+            backgroundColor: '#FFFFFF',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+          }
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          fontSize: '1.5rem',
+          fontWeight: '700',
+          color: '#1A1A1A',
+          textAlign: 'center',
+          py: 2,
+          borderBottom: '1px solid #e0e0e0',
+        }}>
+          Conferma Vendita
+        </DialogTitle>
+        <DialogContent sx={{ py: 2.5, px: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{
+              backgroundColor: '#f5f5f5',
+              p: 2,
+              borderRadius: 1,
+              border: '1px solid #e0e0e0'
+            }}>
+              <Typography sx={{ fontSize: '0.9rem', fontWeight: '600', color: '#666', mb: 1.5 }}>
+                Dettaglio articoli ({articoliSelezionati.length})
+              </Typography>
+              <Box sx={{ maxHeight: '180px', overflowY: 'auto' }}>
+                {articoliSelezionati.map((item) => (
+                  <Box key={item.codice} sx={{ 
+                    mb: 1, 
+                    pb: 1, 
+                    borderBottom: '1px solid #e0e0e0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    '&:last-child': { borderBottom: 'none' }
+                  }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography sx={{ color: '#1A1A1A', fontWeight: '600', fontSize: '0.9rem', mb: 0.2 }}>
+                        {item.codice}
+                      </Typography>
+                      <Typography sx={{ color: '#666', fontSize: '0.75rem' }}>
+                        {item.descrizione?.replace(/\[.*?\]/g, '').trim().substring(0, 40)}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ color: '#FF9800', fontWeight: '700', fontSize: '0.9rem', minWidth: '50px', textAlign: 'right' }}>
+                      ×{item.quantita}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+            <Box sx={{
+              backgroundColor: '#FFF3E0',
+              p: 2,
+              borderRadius: 1,
+              border: '1px solid #FFB74D',
+              textAlign: 'center',
+            }}>
+              <Typography sx={{ color: '#666', fontSize: '0.85rem', mb: 0.8, fontWeight: '500' }}>
+                Importo totale
+              </Typography>
+              <Typography sx={{ fontSize: '2rem', fontWeight: '800', color: '#FF9800' }}>
+                €{articoliSelezionati.reduce((total, articolo) => {
+                  const prezzo = articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato) : parseFloat(articolo.prezzo_originale || 0);
+                  return total + (prezzo * articolo.quantita);
+                }, 0).toFixed(2)}
+              </Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ 
+          p: 2, 
+          gap: 1.5,
+          borderTop: '1px solid #e0e0e0',
+          justifyContent: 'center'
+        }}>
+          <Button
+            onClick={() => setOpenConfirmDialog(false)}
+            variant="outlined"
+            sx={{
+              color: '#666',
+              borderColor: '#d0d0d0',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              textTransform: 'none',
+              px: 3.5,
+              py: 0.9,
+              borderRadius: 0.5,
+              border: '1px solid #d0d0d0',
+              '&:hover': {
+                backgroundColor: '#f5f5f5',
+                borderColor: '#999'
+              }
+            }}
+          >
+            Annulla
+          </Button>
+          <Button
+            onClick={handleConfirmVendita}
+            variant="contained"
+            disabled={loading}
+            sx={{
+              background: '#FF9800',
+              color: '#fff',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              textTransform: 'none',
+              px: 3.5,
+              py: 0.9,
+              borderRadius: 0.5,
+              boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)',
+              '&:hover': {
+                background: '#F57C00',
+                boxShadow: '0 6px 16px rgba(255, 152, 0, 0.4)',
+              },
+              '&:disabled': {
+                background: '#ccc',
+                color: '#999'
+              }
+            }}
+          >
+            {loading ? <CircularProgress size={18} color="inherit" /> : 'Conferma'}
+          </Button>
+        </DialogActions>
+      </Dialog>
       
       <Snackbar
         open={openToast}
