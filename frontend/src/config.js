@@ -4,6 +4,6 @@ const isDevelopment = window.location.hostname === 'localhost' || window.locatio
 
 const API_BASE_URL = isDevelopment
   ? 'http://localhost:5001'  // Development: backend locale
-  : process.env.REACT_APP_API_URL || 'http://localhost:5001';  // Production: set in Vercel env vars
+  : '/api';                  // Production: serverless functions on Vercel
 
 export default API_BASE_URL;
