@@ -4,14 +4,14 @@
   "outputDirectory": "frontend/build",
   "builds": [
     {
-      "src": "api/package.json",
+      "src": "api.js",
       "use": "@vercel/node@4"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/api.js"
     },
     {
       "src": "/static/(.*)",
