@@ -1,4 +1,4 @@
-const { pool, corsHeaders, handleCors, handleError } = require('./utils');
+const { pool, corsHeaders, handleCors, handleError } = require('../utils');
 
 module.exports = async (req, res) => {
   // Handle CORS

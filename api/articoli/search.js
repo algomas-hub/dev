@@ -1,4 +1,4 @@
-const { pool, corsHeaders, handleCors, handleError } = require('./utils');
+const { pool, corsHeaders, handleCors, handleError } = require('../utils');
 
 // Estrai marca, colore e taglia dalla descrizione
 const estraiDatiDescrizione = (descrizione) => {
