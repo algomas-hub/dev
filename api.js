@@ -6,8 +6,15 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS handling
+// Strip /api prefix if present (for Vercel routing)
 app.use((req, res, next) => {
+  if (req.url.startsWith('/api/')) {
+    req.url = req.url.slice(4); // Remove /api prefix
+  } else if (req.url === '/api') {
+    req.url = '';
+  }
+  
+  // CORS headers
   Object.entries(corsHeaders).forEach(([key, val]) => {
     res.setHeader(key, val);
   });
@@ -46,4 +53,7 @@ app.use((req, res) => {
   );
 });
 
-module.exports = app;
+// Export as serverless handler for Vercel
+module.exports = (req, res) => {
+  return app(req, res);
+};
