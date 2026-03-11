@@ -1,13 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "buildCommand": "npm install && npm --prefix frontend install && npm --prefix frontend run build",
+  "buildCommand": "npm --prefix frontend install && npm --prefix frontend run build",
   "outputDirectory": "frontend/build",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs24.x"
+    }
+  },
   "routes": [
     {
       "src": "/api/(.*)",
