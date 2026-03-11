@@ -86,7 +86,7 @@ function CassaContent() {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/articoli/search?termine=${encodeURIComponent(termine)}`
+        `${API_BASE_URL}/articoli/search?termine=${encodeURIComponent(termine)}`
       );
 
       if (!response.ok) {
@@ -351,7 +351,7 @@ function CassaContent() {
         note: item.quantita < 0 ? 'aggiornamento da preventivo - carico' : 'aggiornamento da preventivo - scarico',
       }));
 
-      const response = await fetch(`${API_BASE_URL}/api/movimenti/registra`, {
+      const response = await fetch(`${API_BASE_URL}/movimenti/registra`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

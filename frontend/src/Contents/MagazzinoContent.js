@@ -71,7 +71,7 @@ function MagazzinoContent() {
     try {
       // Se c'è un filtro, usa limit 500. Senza filtro, carica più dati per avere tutti gli articoli
       const limit = termine.trim() ? 500 : 5000;
-      let url = `${API_BASE_URL}/api/magazzino?limit=${limit}`;
+      let url = `${API_BASE_URL}/magazzino?limit=${limit}`;
       
       if (termine.trim()) {
         // Ricerca nel codice articolo
