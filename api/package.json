@@ -1,0 +1,9 @@
+{
+  "name": "api-serverless",
+  "version": "1.0.0",
+  "description": "Serverless API functions for Vercel",
+  "dependencies": {
+    "mysql2": "^3.6.5",
+    "dotenv": "^16.3.1"
+  }
+}
