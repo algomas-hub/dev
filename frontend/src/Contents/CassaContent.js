@@ -89,6 +89,10 @@ function CassaContent() {
         `${API_BASE_URL}/api/articoli/search?termine=${encodeURIComponent(termine)}`
       );
 
+      if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -354,6 +358,10 @@ function CassaContent() {
         },
         body: JSON.stringify({ articoli: movimenti }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+      }
 
       const data = await response.json();
 
