@@ -1,0 +1,22 @@
+{
+  "name": "fullstack-app",
+  "version": "1.0.0",
+  "description": "Full-stack application with React frontend and Node.js API",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "build": "bash build.sh",
+    "start": "cd backend && npm start"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "18.x"
+  }
+}
