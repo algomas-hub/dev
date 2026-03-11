@@ -1,4 +1,4 @@
-const { pool, corsHeaders, handleCors, handleError } = require('../utils');
+const { pool, corsHeaders, handleCors, handleError } = require('./utils');
 
 const estraiDatiDescrizione = (descrizione) => {
   if (!descrizione) return { marca: null, colore: null, taglia: null };
