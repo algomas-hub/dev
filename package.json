@@ -6,7 +6,6 @@
   "scripts": {
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm start",
-    "build": "bash build.sh",
     "start": "cd backend && npm start"
   },
   "dependencies": {
