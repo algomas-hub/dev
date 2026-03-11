@@ -1,9 +1,9 @@
 // Configurazione API
-// In produzione (Vercel): usa gli endpoint relativi
-// In sviluppo locale: usa localhost
-const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.REACT_APP_ENV;
+// Detect environment based on hostname
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 const API_BASE_URL = isDevelopment
-  ? process.env.REACT_APP_API_URL || 'http://localhost:5000'
-  : '/api';
+  ? 'http://localhost:5000'  // Development: backend on localhost:5000
+  : '/api';                  // Production: serverless functions on Vercel
 
 export default API_BASE_URL;
