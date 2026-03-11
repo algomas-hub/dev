@@ -2,24 +2,14 @@
   "version": 2,
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/build",
-  "builds": [
-    {
-      "src": "api.js",
-      "use": "@vercel/node@4"
-    }
-  ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api.js?path=$1"
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
       "src": "/index.html",
       "dest": "/index.html"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
     },
     {
       "src": "/(.*)",
