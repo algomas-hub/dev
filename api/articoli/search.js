@@ -8,7 +8,7 @@ const estraiDatiDescrizione = (descrizione) => {
   if (!matches || matches.length === 0) {
     return { marca: null, colore: null, taglia: null };
   }
-  
+  // Estrai i dati dalle parentesi quadre
   const marca = matches.length > 0 ? matches[0].slice(1, -1) : null;
   const colore = matches.length > 1 ? matches[1].slice(1, -1) : null;
   const taglia = matches.length > 2 ? matches[2].slice(1, -1) : null;
