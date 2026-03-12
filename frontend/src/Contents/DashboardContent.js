@@ -74,7 +74,7 @@ function DashboardContent() {
             backgroundColor: '#FFFFFF'
           }}>
             <img 
-              src="/home-image.jpg" 
+              src="/kala.png" 
               alt="Home" 
               style={{
                 width: '100%',
