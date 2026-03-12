@@ -487,7 +487,7 @@ function CassaContent() {
                                 </Box>
                                 <Box sx={{ borderRadius: 1, border: '1px solid #333333', width: '100%', overflow: 'auto', maxHeight: 'calc(100vh - 80px)', backgroundColor: '#1E1E1E' }}>
                                   <TableContainer sx={{ overflow: 'auto', width: '100%' }}>
-                                    <Table stickyHeader sx={{ minWidth: '600px', width: '100%' }}>
+                                    <Table stickyHeader sx={{ width: '100%', minWidth: { xs: '100%', sm: '100%', md: '600px' }, tableLayout: 'fixed' }}>
                                       <TableHead>
                                         <TableRow sx={{ backgroundColor: '#252525', height: '40px' }}>
                                           <TableCell sx={{ 
@@ -511,7 +511,7 @@ function CassaContent() {
                                             color: '#FF9800',
                                             padding: '4px 6px',
                                             letterSpacing: '0px',
-                                            width: '200px',
+                                            width: { xs: '110px', sm: '130px', md: '200px' },
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis',
                                             whiteSpace: 'nowrap',
@@ -529,7 +529,7 @@ function CassaContent() {
                                             color: '#FF9800',
                                             padding: '4px 6px',
                                             letterSpacing: '0px',
-                                            width: '60px',
+                                            width: { xs: '45px', sm: '50px', md: '55px', lg: '50px' },
                                             cursor: 'pointer',
                                             userSelect: 'none',
                                             textAlign: 'center',
@@ -545,7 +545,7 @@ function CassaContent() {
                                             color: '#E0E0E0',
                                             padding: '4px 6px',
                                             letterSpacing: '0px',
-                                            width: '50px',
+                                            width: { xs: '40px', sm: '45px', md: '50px', lg: '45px' },
                                             textAlign: 'center',
                                             cursor: 'pointer',
                                             userSelect: 'none',
@@ -561,7 +561,7 @@ function CassaContent() {
                                             color: '#E0E0E0',
                                             padding: '4px 6px',
                                             letterSpacing: '0px',
-                                            width: '50px',
+                                            width: { xs: '40px', sm: '45px', md: '50px', lg: '45px' },
                                             textAlign: 'center',
                                             cursor: 'pointer',
                                             userSelect: 'none',
@@ -577,7 +577,7 @@ function CassaContent() {
                                             color: '#E0E0E0',
                                             padding: '4px 6px',
                                             letterSpacing: '0px',
-                                            width: '70px',
+                                            width: { xs: '50px', sm: '50px', md: '60px', lg: '55px' },
                                             textAlign: 'center',
                                             cursor: 'pointer',
                                             userSelect: 'none',
@@ -612,10 +612,10 @@ function CassaContent() {
                                               minHeight: '40px'
                                             }}
                                           >
-                                            <TableCell sx={{ fontSize: '0.75rem', fontWeight: '600', color: '#FFFFFF', padding: '8px', textAlign: 'center', width: '60px' }}>
+                                            <TableCell sx={{ fontSize: '0.75rem', fontWeight: '600', color: '#FFFFFF', padding: '4px', textAlign: 'center', width: { xs: '30px', sm: '50px', md: '55px', lg: '50px' } }}>
                                               {articolo.codice}
                                             </TableCell>
-                                            <TableCell sx={{ fontSize: '0.65rem', color: '#FFFFFF', padding: '8px', width: '200px' }}>
+                                            <TableCell sx={{ fontSize: '0.65rem', color: '#FFFFFF', padding: '4px', width: { xs: '80px', sm: '120px', md: '200px' } }}>
                                               {(() => {
                                                 let coloreName = (articolo.colore_estratto || articolo.colore || '—').toString().toUpperCase().trim();
                                                 let tagliaName = (articolo.taglia_estratta || articolo.dimensioni || articolo.taglia || '').toString().toUpperCase().trim();
@@ -664,9 +664,10 @@ function CassaContent() {
                                                 );
                                               })()}
                                             </TableCell>
-                                            <TableCell sx={{ fontSize: '0.75rem', color: '#FFFFFF', padding: '8px', fontWeight: '500', width: '60px', textAlign: 'center' }}>
+                                            <TableCell sx={{ fontSize: '0.75rem', color: '#FFFFFF', padding: '8px', fontWeight: '500', width: { xs: '45px', sm: '45px', md: '60px' }, textAlign: 'center' }}>
                                               {(() => {
                                                 let coloreName = (articolo.colore_estratto || articolo.colore || '—').toString().toUpperCase().trim();
+                                                console.log('DEBUG Color:', { colore_estratto: articolo.colore_estratto, colore: articolo.colore, coloreName, codice: articolo.codice });
                                                 
                                                 const colorMap = {
                                                   'OD': '#747b4f',
@@ -709,7 +710,7 @@ function CassaContent() {
                                                 if (coloreName === 'MULTICAM') {
                                                   return (
                                                     <Tooltip title={coloreName} arrow>
-                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#bfb198', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%23bfb198"/><ellipse cx="8" cy="8" rx="6" ry="4" fill="%2381613c"/><ellipse cx="16" cy="16" rx="7" ry="5" fill="%23554D41"/><ellipse cx="14" cy="7" rx="4" ry="2" fill="%23b38b6d"/><ellipse cx="7" cy="17" rx="5" ry="3" fill="%23bfb198"/><ellipse cx="18" cy="10" rx="3" ry="2" fill="%2381613c"/></svg>')`, backgroundSize: 'cover' }} />
+                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#bfb198', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%23bfb198"/><ellipse cx="8" cy="8" rx="6" ry="4" fill="%2381613c"/><ellipse cx="16" cy="16" rx="7" ry="5" fill="%23554D41"/><ellipse cx="14" cy="7" rx="4" ry="2" fill="%23b38b6d"/><ellipse cx="7" cy="17" rx="5" ry="3" fill="%23bfb198"/><ellipse cx="18" cy="10" rx="3" ry="2" fill="%2381613c"/></svg>')`, backgroundSize: 'cover', display: 'inline-block', verticalAlign: 'middle' }} />
                                                     </Tooltip>
                                                   );
                                                 }
@@ -717,7 +718,7 @@ function CassaContent() {
                                                 if (coloreName === 'MULTICAM BLACK') {
                                                   return (
                                                     <Tooltip title={coloreName} arrow>
-                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#3D3D3D', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%233D3D3D"/><ellipse cx="8" cy="8" rx="6" ry="4" fill="%23000000"/><ellipse cx="16" cy="16" rx="7" ry="5" fill="%23262626"/><ellipse cx="14" cy="7" rx="4" ry="2" fill="%23595959"/><ellipse cx="7" cy="17" rx="5" ry="3" fill="%23595959"/><ellipse cx="18" cy="10" rx="3" ry="2" fill="%23262626"/></svg>')`, backgroundSize: 'cover' }} />
+                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#3D3D3D', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%233D3D3D"/><ellipse cx="8" cy="8" rx="6" ry="4" fill="%23000000"/><ellipse cx="16" cy="16" rx="7" ry="5" fill="%23262626"/><ellipse cx="14" cy="7" rx="4" ry="2" fill="%23595959"/><ellipse cx="7" cy="17" rx="5" ry="3" fill="%23595959"/><ellipse cx="18" cy="10" rx="3" ry="2" fill="%23262626"/></svg>')`, backgroundSize: 'cover', display: 'inline-block', verticalAlign: 'middle' }} />
                                                     </Tooltip>
                                                   );
                                                 }
@@ -725,7 +726,7 @@ function CassaContent() {
                                                 if (coloreName === 'WOODLAND') {
                                                   return (
                                                     <Tooltip title={coloreName} arrow>
-                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#2D2D15', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%232D2D15"/><rect x="0" y="0" width="6" height="6" fill="%23556B2F"/><rect x="6" y="2" width="6" height="6" fill="%234A5B2A"/><rect x="12" y="4" width="6" height="6" fill="%23556B2F"/><rect x="18" y="1" width="6" height="6" fill="%234A5B2A"/><rect x="2" y="8" width="6" height="6" fill="%234A5B2A"/><rect x="8" y="10" width="6" height="6" fill="%23556B2F"/><rect x="14" y="8" width="6" height="6" fill="%234A5B2A"/><rect x="20" y="12" width="4" height="4" fill="%23556B2F"/><rect x="4" y="16" width="6" height="6" fill="%23556B2F"/><rect x="12" y="14" width="6" height="6" fill="%234A5B2A"/><rect x="18" y="16" width="6" height="6" fill="%23556B2F"/><rect x="0" y="12" width="4" height="6" fill="%234A5B2A"/></svg>')`, backgroundSize: 'cover' }} />
+                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#2D2D15', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%232D2D15"/><rect x="0" y="0" width="6" height="6" fill="%23556B2F"/><rect x="6" y="2" width="6" height="6" fill="%234A5B2A"/><rect x="12" y="4" width="6" height="6" fill="%23556B2F"/><rect x="18" y="1" width="6" height="6" fill="%234A5B2A"/><rect x="2" y="8" width="6" height="6" fill="%234A5B2A"/><rect x="8" y="10" width="6" height="6" fill="%23556B2F"/><rect x="14" y="8" width="6" height="6" fill="%234A5B2A"/><rect x="20" y="12" width="4" height="4" fill="%23556B2F"/><rect x="4" y="16" width="6" height="6" fill="%23556B2F"/><rect x="12" y="14" width="6" height="6" fill="%234A5B2A"/><rect x="18" y="16" width="6" height="6" fill="%23556B2F"/><rect x="0" y="12" width="4" height="6" fill="%234A5B2A"/></svg>')`, backgroundSize: 'cover', display: 'inline-block', verticalAlign: 'middle' }} />
                                                     </Tooltip>
                                                   );
                                                 }
@@ -733,27 +734,35 @@ function CassaContent() {
                                                 if (coloreName === 'VEGETATO') {
                                                   return (
                                                     <Tooltip title={coloreName} arrow>
-                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#6B7D3A', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%236B7D3A"/><rect x="1" y="2" width="5" height="5" fill="%234A5B2A"/><rect x="8" y="1" width="5" height="5" fill="%235A6B32"/><rect x="15" y="3" width="5" height="5" fill="%234A5B2A"/><rect x="3" y="10" width="5" height="5" fill="%235A6B32"/><rect x="11" y="9" width="5" height="5" fill="%234A5B2A"/><rect x="18" y="10" width="5" height="5" fill="%235A6B32"/><rect x="2" y="17" width="5" height="5" fill="%234A5B2A"/><rect x="9" y="16" width="5" height="5" fill="%235A6B32"/><rect x="16" y="17" width="5" height="5" fill="%234A5B2A"/></svg>')`, backgroundSize: 'cover' }} />
+                                                      <Box sx={{ width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', backgroundColor: '#6B7D3A', backgroundImage: `url('data:image/svg+xml;utf8,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="%236B7D3A"/><rect x="1" y="2" width="5" height="5" fill="%234A5B2A"/><rect x="8" y="1" width="5" height="5" fill="%235A6B32"/><rect x="15" y="3" width="5" height="5" fill="%234A5B2A"/><rect x="3" y="10" width="5" height="5" fill="%235A6B32"/><rect x="11" y="9" width="5" height="5" fill="%234A5B2A"/><rect x="18" y="10" width="5" height="5" fill="%235A6B32"/><rect x="2" y="17" width="5" height="5" fill="%234A5B2A"/><rect x="9" y="16" width="5" height="5" fill="%235A6B32"/><rect x="16" y="17" width="5" height="5" fill="%234A5B2A"/></svg>')`, backgroundSize: 'cover', display: 'inline-block', verticalAlign: 'middle' }} />
                                                     </Tooltip>
                                                   );
                                                 }
                                                 
-                                                // Prova a trovare una corrispondenza exacta prima
+                                                // Prova a trovare una corrispondenza exacta
                                                 let colorCode = colorMap[coloreName];
                                                 
-                                                // Se non trovato, default grigio
+                                                // Se non trovato, prova versioni alternative (lowercase, con spazi rimossi, ecc)
+                                                if (!colorCode) {
+                                                  const coloreLowercase = coloreName.toLowerCase();
+                                                  colorCode = Object.keys(colorMap).find(key => key.toLowerCase() === coloreLowercase) 
+                                                    ? colorMap[Object.keys(colorMap).find(key => key.toLowerCase() === coloreLowercase)]
+                                                    : null;
+                                                }
+                                                
+                                                // Se ancora non trovato, default grigio
                                                 if (!colorCode) {
                                                   colorCode = '#CCCCCC';
                                                 }
                                                 
                                                 return (
                                                   <Tooltip title={coloreName} arrow>
-                                                    <Box sx={{ width: '24px', height: '24px', backgroundColor: colorCode, borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer' }} />
+                                                    <div style={{ width: '24px', height: '24px', backgroundColor: colorCode, borderRadius: '4px', border: '1px solid #FFFFFF', cursor: 'pointer', display: 'inline-block' }} />
                                                   </Tooltip>
                                                 );
                                               })()}
                                             </TableCell>
-                                            <TableCell sx={{ fontSize: '0.9rem', color: '#FFFFFF', padding: '8px', fontWeight: '600', width: '50px', textAlign: 'center' }}>
+                                            <TableCell sx={{ fontSize: '0.9rem', color: '#FFFFFF', padding: '4px', fontWeight: '600', width: { xs: '35px', sm: '45px', md: '48px', lg: '45px' }, textAlign: 'center' }}>
                                               {(() => {
                                                 let tagliaName = (articolo.taglia_estratta || articolo.dimensioni || articolo.taglia || '').toString().toUpperCase().trim();
                                                 if (tagliaName === 'BLACK' && (articolo.colore_estratto || articolo.colore || '').toString().toUpperCase().trim() === 'MULTICAM') {
@@ -762,27 +771,56 @@ function CassaContent() {
                                                 return tagliaName;
                                               })()}
                                             </TableCell>
-                                            <TableCell sx={{ fontSize: '0.9rem', color: '#FFFFFF', padding: '8px', fontWeight: '700', width: '50px', textAlign: 'center' }}>
-                                              {Math.floor(articolo.quantita_disponibile || 0)}
+                                            <TableCell sx={{ fontSize: '0.9rem', padding: '8px', fontWeight: '700', width: { xs: '35px', sm: '45px', md: '50px' }, textAlign: 'center' }}>
+                                              {(() => {
+                                                const qty = Math.floor(articolo.quantita_disponibile || 0);
+                                                let badgeColor = '#4CAF50'; // Verde
+                                                let bgColor = '#0D3B16'; // Verde scuro
+                                                let textColor = '#FFFFFF';
+                                                
+                                                if (qty === 0) {
+                                                  badgeColor = '#FF9800'; // Arancione
+                                                  bgColor = '#C84500'; // Arancione scuro
+                                                } else if (qty < 0) {
+                                                  badgeColor = '#F44336'; // Rosso
+                                                  bgColor = '#7B0A0A'; // Rosso scuro
+                                                }
+                                                
+                                                return (
+                                                  <span style={{
+                                                    backgroundColor: bgColor,
+                                                    color: textColor,
+                                                    padding: '3px 5px',
+                                                    borderRadius: '4px',
+                                                    display: 'inline-block',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '700',
+                                                    minWidth: '28px',
+                                                    textAlign: 'center',
+                                                    border: `1px solid ${badgeColor}`
+                                                  }}>
+                                                    {qty}
+                                                  </span>
+                                                );
+                                              })()}
                                             </TableCell>
-                                            <TableCell sx={{ fontSize: '0.9rem', padding: '8px', width: '70px', textAlign: 'center' }}>
-                                              {articolo.prezzo_originale && parseFloat(articolo.prezzo_originale) > 0 && (
+                                            <TableCell sx={{ fontSize: '0.9rem', padding: '4px', width: { xs: '50px', sm: '60px', md: '65px', lg: '60px' }, textAlign: 'center' }}>
+                                              {articolo.prezzo_originale && articolo.prezzo_scontato && parseFloat(articolo.prezzo_originale) > parseFloat(articolo.prezzo_scontato) && (
                                                 <Box sx={{
                                                   display: 'flex',
                                                   flexDirection: 'column',
                                                   alignItems: 'center',
-                                                  gap: 0.25,
-                                                  border: '2px solid #FF9800',
-                                                  borderRadius: '6px',
-                                                  padding: '2px 6px',
-                                                  background: 'rgba(0,0,0,0.10)'
+                                                  gap: 0.25
                                                 }}>
+                                                  <span style={{ color: '#B0BEC5', fontWeight: '600', fontSize: '0.8rem', textDecoration: 'line-through' }}>
+                                                    {parseFloat(articolo.prezzo_originale).toFixed(2)} €
+                                                  </span>
                                                   <span style={{ color: '#FFFFFF', fontWeight: '700', fontSize: '0.95rem' }}>
-                                                    {articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato).toFixed(2) : 'N/A'} €
+                                                    {parseFloat(articolo.prezzo_scontato).toFixed(2)} €
                                                   </span>
                                                 </Box>
                                               )}
-                                              {(!articolo.prezzo_originale || (parseFloat(articolo.prezzo_originale) <= 0)) && (
+                                              {(!articolo.prezzo_originale || !articolo.prezzo_scontato || parseFloat(articolo.prezzo_originale) <= parseFloat(articolo.prezzo_scontato)) && (
                                                 <span style={{ color: '#FFFFFF', fontWeight: '700', fontSize: '0.95rem' }}>
                                                   {articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato).toFixed(2) : 'N/A'} €
                                                 </span>
