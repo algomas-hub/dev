@@ -19,7 +19,6 @@ import {
   CardContent,
   Grid,
   IconButton,
-  Snackbar,
   ButtonGroup,
   Stack,
   Checkbox,
@@ -31,7 +30,6 @@ import {
   DialogActions,
 } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import RemoveCircleRoundedIcon from '@mui/icons-material/RemoveCircleRounded';
@@ -184,7 +182,6 @@ function CassaContent() {
   const renderHeaderWithCheckbox = (column, label, sortCriteria, setSortCriteria, handleSort) => {
     const isChecked = sortCriteria.some(c => c.column === column);
     const direction = sortCriteria.find(c => c.column === column)?.order || 'asc';
-    const priority = sortCriteria.findIndex(c => c.column === column) + 1; // 1, 2, 3...
     
     const toggleCheckbox = (e) => {
       e.stopPropagation();
