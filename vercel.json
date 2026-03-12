@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build && cp public/kala.png build/ && cp public/home-image.jpg build/",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "frontend/build",
   "routes": [
     {
@@ -10,10 +10,6 @@
     {
       "src": "/static/(.*)",
       "dest": "/static/$1"
-    },
-    {
-      "src": "/(.+\\.(png|jpg|jpeg|gif|svg|ico|webp))",
-      "dest": "/$1"
     },
     {
       "src": "/index.html",
