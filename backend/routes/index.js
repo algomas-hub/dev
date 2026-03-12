@@ -390,4 +390,54 @@ router.post('/movimenti/registra', async (req, res) => {
   }
 });
 
+// GET - Prodotti più venduti (articoli EXE- con quantità vendute)
+// Usa: GET /api/top-products?limit=10
+router.get('/top-products', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const connection = await pool.getConnection();
+
+    const query = `
+      SELECT 
+        m.articolo as codice,
+        a.descrizione,
+        a.colore,
+        a.dimensioni,
+        SUM(m.quantita) as quantita_vendute,
+        COALESCE(ap.prezzo, 0) as prezzo_originale,
+        COALESCE(ap.sconto1, 0) as sconto1,
+        COALESCE(ap.sconto2, 0) as sconto2,
+        CASE 
+          WHEN COALESCE(ap.prezzo, 0) > 0 THEN ROUND(COALESCE(ap.prezzo, 0) * (1 - COALESCE(ap.sconto1, 0) / 100) * (1 - COALESCE(ap.sconto2, 0) / 100), 2)
+          ELSE 0
+        END as prezzo_scontato
+      FROM movimenti_magazzino m
+      LEFT JOIN articoli a ON m.articolo = a.codice
+      LEFT JOIN articoli_prezzi ap ON m.articolo = ap.articolo AND ap.listino = 'BASE'
+      WHERE m.note = 'aggiornamento da preventivo - scarico' AND YEAR(m.data) = YEAR(CURDATE())
+      GROUP BY m.articolo, a.descrizione, a.colore, a.dimensioni, ap.articolo, ap.listino, ap.prezzo, ap.sconto1, ap.sconto2
+      ORDER BY quantita_vendute DESC
+      LIMIT ?
+    `;
+
+    const [rows] = await connection.query(query, [parseInt(limit)]);
+    connection.release();
+
+    // Estrai marca, colore e taglia dalla descrizione
+    const rowsConDati = rows.map(row => {
+      const { marca, colore, taglia } = estraiDatiDescrizione(row.descrizione);
+      return {
+        ...row,
+        marca_estratto: marca,
+        colore_estratto: colore,
+        taglia_estratta: taglia
+      };
+    });
+
+    res.json({ success: true, data: rowsConDati });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

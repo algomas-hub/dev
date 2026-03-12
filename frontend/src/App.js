@@ -22,7 +22,7 @@ const theme = createTheme({
       main: '#00BCD4',
     },
     background: {
-      default: '#121212',
+      default: 'transparent',
       paper: '#1E1E1E',
     },
     divider: '#333333',
@@ -248,9 +248,10 @@ function App() {
             <Box sx={{ display: { xs: 'block', md: 'none' }, pt: 8 }} />
             <Routes>
               <Route path="/" exact element={<DashboardContent />} />
+              <Route path="/cassa" exact element={<CassaContent />} />
               <Route path="/link" exact element={<LinkContent />} />
               <Route path="/magazzino" exact element={<MagazzinoContent />} />
-              <Route path="/cassa" exact element={<CassaContent />} />
+              <Route path="/dashboard" exact element={<DashboardContent />} />
             </Routes>
           </Box>
         </Box>

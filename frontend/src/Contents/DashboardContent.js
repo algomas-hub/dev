@@ -1,15 +1,92 @@
-import { Container, Box, Typography } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 
 function DashboardContent() {
-    return (
-      
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Box role="main">
-                <Typography variant="h3">Home Content</Typography>
-            </Box>
-        </Container>
-
-    );
+  return (
+    <Box sx={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      minHeight: '100vh',
+      padding: 2,
+      background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #0f0f0f 100%)'
+    }}>
+      <Paper sx={{
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backdropFilter: 'blur(10px)',
+        padding: 5,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        borderRadius: 4,
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
+        maxWidth: '900px'
+      }}>
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
+        }}>
+          <Box sx={{
+            fontSize: '56px',
+            fontWeight: 900,
+            color: '#ffffff',
+            textAlign: 'left',
+            fontFamily: "'Roboto', sans-serif",
+            letterSpacing: '-1px',
+            lineHeight: 1.2,
+            background: 'linear-gradient(135deg, #ffffff 0%, #cccccc 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Morris AI
+          </Box>
+          <Box sx={{
+            fontSize: '20px',
+            fontWeight: 300,
+            color: '#aaaaaa',
+            textAlign: 'left',
+            fontFamily: "'Roboto', sans-serif",
+            letterSpacing: '1px',
+            textTransform: 'uppercase'
+          }}>
+            c'hai le ssiga?
+          </Box>
+        </Box>
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}>
+          <Box sx={{
+            width: '280px',
+            height: '280px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 15px 40px rgba(0, 0, 0, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#000000'
+          }}>
+            <img 
+              src="/kala.png" 
+              alt="Home" 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
+  );
 }
 
 export default DashboardContent;

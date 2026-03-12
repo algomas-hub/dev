@@ -1,3 +1,36 @@
+/* Nascondi scrollbar ma mantieni lo scroll */
+html, body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #0f0f0f 100%) !important;
+  min-height: 100vh;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Nasconde scrollbar su elementi specifici */
+div::-webkit-scrollbar, 
+section::-webkit-scrollbar, 
+main::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -11,3 +44,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Rimuovi background color dai container Material-UI */
+.css-1ral5ny {
+  background-color: transparent !important;
+}
+
+/* Rimuovi background da tutti i MuiBox-root e elementi simili */
+.MuiBox-root {
+  background-color: transparent !important;
+}
+
+main {
+  background-color: transparent !important;
+}
+
+

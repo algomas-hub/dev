@@ -39,9 +39,9 @@ export default function SideMenu({ onLogout, collapsed = false, onToggleCollapse
   const location = useLocation();
 
   const menuItems = [
+    { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'Cassa', path: '/cassa', icon: <ShoppingCartIcon /> },
     { label: 'Magazzino', path: '/magazzino', icon: <InventoryIcon /> },
-    { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'Link', path: '/link', icon: <LinkIcon /> },
   ];
 
