@@ -12,6 +12,11 @@
       "dest": "/static/$1"
     },
     {
+      "src": "/(.+\\.(png|jpg|jpeg|gif|svg|ico|webp|manifest|robots\\.txt))",
+      "dest": "/$1",
+      "continue": true
+    },
+    {
       "src": "/index.html",
       "dest": "/index.html"
     },

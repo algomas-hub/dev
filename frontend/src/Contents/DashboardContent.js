@@ -74,7 +74,7 @@ function DashboardContent() {
             backgroundColor: '#000000'
           }}>
             <img 
-              src={process.env.PUBLIC_URL + '/kala.png'} 
+              src="/kala.png" 
               alt="Home" 
               style={{
                 width: '100%',
