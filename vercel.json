@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "bash build.sh",
+  "buildCommand": "cd frontend && npm install && npm run build && cp public/*.{png,jpg,jpeg} build/ 2>/dev/null || true",
   "outputDirectory": "frontend/build",
   "routes": [
     {
