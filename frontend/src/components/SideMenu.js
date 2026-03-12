@@ -165,7 +165,6 @@ export default function SideMenu({ onLogout, collapsed = false, onToggleCollapse
           }}
         >
           {!collapsed && 'Logout'}
-          {collapsed && <LogoutRoundedIcon />}
         </Button>
         {!collapsed && (
           <Typography variant="caption" sx={{ color: 'text.secondary', textAlign: 'center', mt: 1 }}>

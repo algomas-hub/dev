@@ -426,10 +426,9 @@ function CassaContent() {
           <Grid item xs={12} md={8} sx={{ display: 'flex', flexDirection: 'column' }}>
             <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.2)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)', borderRadius: 3 }}>
               <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 0.75, pb: 0.75 }}>
-                <Box sx={{ display: 'flex', gap: 1, mb: 1, mt: -0.5 }}>
+                <Box sx={{ display: 'flex', gap: 1, mb: 1, mt: 1, justifyContent: 'center' }}>
                   <TextField
                     ref={searchInputRef}
-                    fullWidth
                     label="Ricerca articoli"
                     value={searchCodice}
                     onChange={(e) => setSearchCodice(e.target.value)}
@@ -438,9 +437,10 @@ function CassaContent() {
                     variant="standard"
                     size="small"
                     sx={{
+                      width: '500px',
                       '& .MuiInput-input': {
                         color: '#FFFFFF',
-                        fontSize: '0.95rem',
+                        fontSize: '1.1rem',
                         py: '3px',
                       },
                       '& .MuiInputBase-input::placeholder': {
@@ -454,13 +454,13 @@ function CassaContent() {
                         borderBottomColor: 'rgba(255, 255, 255, 0.4)',
                       },
                       '& .MuiInput-underline:after': {
-                        borderBottomColor: '#4CAF50',
+                        borderBottomColor: '#FF9800',
                       },
                       '& .MuiInputLabel-root': {
                         color: 'rgba(255, 255, 255, 0.7)',
                       },
                       '& .MuiInputLabel-root.Mui-focused': {
-                        color: '#4CAF50',
+                        color: '#FF9800',
                       },
                     }}
                     InputProps={{

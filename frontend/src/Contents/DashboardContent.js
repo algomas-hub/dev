@@ -37,7 +37,7 @@ function DashboardContent() {
             fontFamily: "'Roboto', sans-serif",
             letterSpacing: '-1px',
             lineHeight: 1.2,
-            background: 'linear-gradient(135deg, #ffffff 0%, #cccccc 100%)',
+            background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -46,8 +46,8 @@ function DashboardContent() {
           </Box>
           <Box sx={{
             fontSize: '20px',
-            fontWeight: 300,
-            color: '#aaaaaa',
+            fontWeight: 700,
+            color: '#FFFFFF',
             textAlign: 'left',
             fontFamily: "'Roboto', sans-serif",
             letterSpacing: '1px',
