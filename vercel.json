@@ -12,9 +12,12 @@
       "dest": "/static/$1"
     },
     {
-      "src": "/(.+\\.(png|jpg|jpeg|gif|svg|ico|webp|manifest|robots\\.txt))",
-      "dest": "/$1",
-      "continue": true
+      "src": "/kala.png",
+      "dest": "/kala.png"
+    },
+    {
+      "src": "/home-image.jpg",
+      "dest": "/home-image.jpg"
     },
     {
       "src": "/index.html",
