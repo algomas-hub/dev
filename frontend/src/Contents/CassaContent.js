@@ -767,10 +767,16 @@ function CassaContent() {
                                             </TableCell>
                                             <TableCell sx={{ fontSize: '0.9rem', padding: '8px', width: '70px', textAlign: 'center' }}>
                                               {articolo.prezzo_originale && parseFloat(articolo.prezzo_originale) > 0 && (
-                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.25 }}>
-                                                  <span style={{ color: '#FFFFFF', textDecoration: 'line-through', fontSize: '0.75rem', opacity: 0.7 }}>
-                                                    {parseFloat(articolo.prezzo_originale).toFixed(2)} €
-                                                  </span>
+                                                <Box sx={{
+                                                  display: 'flex',
+                                                  flexDirection: 'column',
+                                                  alignItems: 'center',
+                                                  gap: 0.25,
+                                                  border: '2px solid #FF9800',
+                                                  borderRadius: '6px',
+                                                  padding: '2px 6px',
+                                                  background: 'rgba(0,0,0,0.10)'
+                                                }}>
                                                   <span style={{ color: '#FFFFFF', fontWeight: '700', fontSize: '0.95rem' }}>
                                                     {articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato).toFixed(2) : 'N/A'} €
                                                   </span>
@@ -852,7 +858,7 @@ function CassaContent() {
                     color="secondary"
                     size="small"
                     onClick={handleAggiorna}
-                    disabled={loading}
+                    disabled={loading || articoliSelezionati.length === 0}
                     sx={{
                       py: 1.5,
                       px: 4,
@@ -895,7 +901,7 @@ function CassaContent() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5, justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                       <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#FFFFFF', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <ShoppingBagRoundedIcon sx={{ fontSize: '1.4rem', color: '#FFFFFF' }} /> Articoli nel Carrello
+                        <ShoppingBagRoundedIcon sx={{ fontSize: '1.4rem', color: '#FF9800' }} /> Articoli nel Carrello
                       </Typography>
                       <Chip
                         label={articoliSelezionati.length}
@@ -942,8 +948,8 @@ function CassaContent() {
                           {articoliSelezionatiOrdinati.map((articolo) => (
                             <Grid item xs={12} sm={6} md={6} key={articolo.codice}>
                               <Box sx={{
-                                backgroundColor: '#2A2A2A',
-                                border: '2px solid #444444',
+                                backgroundColor: 'rgba(128, 128, 128, 0.75) !important',
+                                border: '2px solid #666666',
                                 borderRadius: 0.5,
                                 p: 0.75,
                                 display: 'flex',
@@ -953,9 +959,10 @@ function CassaContent() {
                                 gap: 0.3,
                                 height: '130px',
                                 position: 'relative',
+                                backdropFilter: 'none !important',
                                 '&:hover': {
-                                  backgroundColor: '#252525',
-                                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                                  backgroundColor: 'rgba(112, 112, 112, 0.75) !important',
+                                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
                                   transition: 'all 0.2s ease',
                                 }
                               }}>
@@ -976,7 +983,7 @@ function CassaContent() {
                                     }
                                   }}
                                 >
-                                  <DeleteOutlineRoundedIcon sx={{ fontSize: '1.2rem', color: '#FFFFFF' }} />
+                                  <DeleteOutlineRoundedIcon sx={{ fontSize: '1.2rem', color: '#FF9800' }} />
                                 </IconButton>
                                 
                                 {/* Riga 2: Descrizione con Colore e Taglia */}
@@ -1059,22 +1066,19 @@ function CassaContent() {
                                 </Box>
                                 
                                 {/* Riga 4: Prezzo - Centrato e Evidente */}
-                                <Box sx={{ 
-                                  width: '100%',
-                                  textAlign: 'center',
-                                  padding: '0.1rem 0',
-                                  backgroundColor: 'rgba(76, 175, 80, 0.15)',
-                                  borderRadius: 0.5,
-                                  border: '1px solid rgba(76, 175, 80, 0.2)',
-                                  marginTop: 'auto'
+                                <Box sx={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  gap: 0.25,
+                                  border: '2px solid #FF9800',
+                                  borderRadius: '6px',
+                                  padding: '2px 6px',
+                                  background: 'rgba(0,0,0,0.10)'
                                 }}>
-                                  <Box sx={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 'bold', letterSpacing: '0.5px' }}>
-                                    {articolo.prezzo_scontato && articolo.prezzo_scontato < articolo.prezzo_originale ? (
-                                      `€${(parseFloat(articolo.prezzo_scontato) * articolo.quantita).toFixed(2)}`
-                                    ) : (
-                                      `€${(parseFloat(articolo.prezzo_originale || 0) * articolo.quantita).toFixed(2)}`
-                                    )}
-                                  </Box>
+                                  <span style={{ color: '#FFFFFF', fontWeight: '700', fontSize: '0.95rem' }}>
+                                    {articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato).toFixed(2) : 'N/A'} €
+                                  </span>
                                 </Box>
                               </Box>
                             </Grid>
@@ -1097,7 +1101,7 @@ function CassaContent() {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: 2,
             backgroundColor: 'rgba(255, 255, 255, 0.08)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -1114,22 +1118,23 @@ function CassaContent() {
         <DialogTitle sx={{
           fontSize: '1.5rem',
           fontWeight: '700',
-          color: '#1A1A1A',
+          color: '#FFFFFF',
           textAlign: 'center',
-          py: 2,
-          borderBottom: '1px solid #e0e0e0',
+          py: 2.5,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         }}>
-          Conferma Vendita
+          ✓ Conferma Vendita
         </DialogTitle>
         <DialogContent sx={{ py: 2.5, px: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{
-              backgroundColor: '#f5f5f5',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
               p: 2,
-              borderRadius: 1,
-              border: '1px solid #e0e0e0'
+              borderRadius: 1.5,
+              border: '1px solid rgba(255, 255, 255, 0.15)'
             }}>
-              <Typography sx={{ fontSize: '0.9rem', fontWeight: '600', color: '#666', mb: 1.5 }}>
+              <Typography sx={{ fontSize: '0.9rem', fontWeight: '600', color: '#CCCCCC', mb: 1.5 }}>
                 Dettaglio articoli ({articoliSelezionati.length})
               </Typography>
               <Box sx={{ maxHeight: '180px', overflowY: 'auto' }}>
@@ -1137,21 +1142,21 @@ function CassaContent() {
                   <Box key={item.codice} sx={{ 
                     mb: 1, 
                     pb: 1, 
-                    borderBottom: '1px solid #e0e0e0',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     '&:last-child': { borderBottom: 'none' }
                   }}>
                     <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ color: '#1A1A1A', fontWeight: '600', fontSize: '0.9rem', mb: 0.2 }}>
+                      <Typography sx={{ color: '#FFFFFF', fontWeight: '600', fontSize: '0.9rem', mb: 0.2 }}>
                         {item.codice}
                       </Typography>
-                      <Typography sx={{ color: '#666', fontSize: '0.75rem' }}>
+                      <Typography sx={{ color: '#AAAAAA', fontSize: '0.75rem' }}>
                         {item.descrizione?.replace(/\[.*?\]/g, '').trim().substring(0, 40)}
                       </Typography>
                     </Box>
-                    <Typography sx={{ color: '#4CAF50', fontWeight: '700', fontSize: '0.9rem', minWidth: '50px', textAlign: 'right' }}>
+                    <Typography sx={{ color: '#FF9800', fontWeight: '700', fontSize: '0.9rem', minWidth: '50px', textAlign: 'right' }}>
                       ×{item.quantita}
                     </Typography>
                   </Box>
@@ -1159,16 +1164,17 @@ function CassaContent() {
               </Box>
             </Box>
             <Box sx={{
-              backgroundColor: '#FFF3E0',
+              backgroundColor: 'rgba(255, 152, 0, 0.15)',
+              backdropFilter: 'blur(10px)',
               p: 2,
-              borderRadius: 1,
-              border: '1px solid #FFB74D',
+              borderRadius: 1.5,
+              border: '2px solid rgba(255, 152, 0, 0.3)',
               textAlign: 'center',
             }}>
-              <Typography sx={{ color: '#666', fontSize: '0.85rem', mb: 0.8, fontWeight: '500' }}>
+              <Typography sx={{ color: '#CCCCCC', fontSize: '0.85rem', mb: 0.8, fontWeight: '500' }}>
                 Importo totale
               </Typography>
-              <Typography sx={{ fontSize: '2rem', fontWeight: '800', color: '#4CAF50' }}>
+              <Typography sx={{ fontSize: '2rem', fontWeight: '800', color: '#FF9800' }}>
                 €{articoliSelezionati.reduce((total, articolo) => {
                   const prezzo = articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato) : parseFloat(articolo.prezzo_originale || 0);
                   return total + (prezzo * articolo.quantita);
@@ -1178,27 +1184,27 @@ function CassaContent() {
           </Box>
         </DialogContent>
         <DialogActions sx={{ 
-          p: 2, 
+          p: 2.5, 
           gap: 1.5,
-          borderTop: '1px solid #e0e0e0',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           justifyContent: 'center'
         }}>
           <Button
             onClick={() => setOpenConfirmDialog(false)}
             variant="outlined"
             sx={{
-              color: '#666',
-              borderColor: '#d0d0d0',
+              color: '#AAAAAA',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
               fontSize: '0.9rem',
               fontWeight: '600',
               textTransform: 'none',
               px: 3.5,
-              py: 0.9,
-              borderRadius: 0.5,
-              border: '1px solid #d0d0d0',
+              py: 1,
+              borderRadius: 1,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               '&:hover': {
-                backgroundColor: '#f5f5f5',
-                borderColor: '#999'
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                borderColor: 'rgba(255, 255, 255, 0.4)'
               }
             }}
           >
@@ -1209,26 +1215,26 @@ function CassaContent() {
             variant="contained"
             disabled={loading}
             sx={{
-              background: '#4CAF50',
-              color: '#fff',
+              background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
+              color: '#000',
               fontSize: '0.9rem',
               fontWeight: '600',
               textTransform: 'none',
               px: 3.5,
-              py: 0.9,
-              borderRadius: 0.5,
-              boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)',
+              py: 1,
+              borderRadius: 1,
+              boxShadow: '0 4px 12px rgba(255, 152, 0, 0.4)',
               '&:hover': {
-                background: '#388E3C',
-                boxShadow: '0 6px 16px rgba(255, 152, 0, 0.4)',
+                background: 'linear-gradient(135deg, #F57C00 0%, #E65100 100%)',
+                boxShadow: '0 6px 16px rgba(255, 152, 0, 0.6)',
               },
               '&:disabled': {
-                background: '#ccc',
-                color: '#999'
+                background: '#666666',
+                color: '#999999'
               }
             }}
           >
-            {loading ? <CircularProgress size={18} color="inherit" /> : 'Conferma'}
+            {loading ? <CircularProgress size={18} color="inherit" /> : '✓ Conferma'}
           </Button>
         </DialogActions>
       </Dialog>
