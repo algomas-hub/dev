@@ -3,7 +3,7 @@
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const API_BASE_URL = isDevelopment
-  ? 'http://localhost:5001'  // Development: backend locale
-  : '/api';                  // Production: serverless functions on Vercel
+  ? 'http://localhost:5001/api'  // Development: backend locale
+  : '/api';                       // Production: serverless functions on Vercel
 
 export default API_BASE_URL;

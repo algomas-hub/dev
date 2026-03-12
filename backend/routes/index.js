@@ -295,36 +295,10 @@ router.get('/articoli/search', async (req, res) => {
     }
 
     const connection = await pool.getConnection();
-    const firstTerm = `%${termine.trim().split(/\s+/)[0]}%`;
-    
-    // Step 1: ricerca veloce - solo articoli matching
+    const fullTerm = `%${termine.trim()}%`;
+
+    // Ricerca diretta e precisa su tutte le colonne rilevanti
     const searchQuery = `
-      SELECT DISTINCT a.codice 
-      FROM articoli a
-      WHERE 
-        a.codice LIKE ? OR
-        a.descrizione LIKE ? OR
-        a.codice_a_barre LIKE ? OR
-        a.codice_fornitore LIKE ? OR
-        a.codice_fornitore2 LIKE ? OR
-        a.codice_fornitore3 LIKE ? OR
-        a.codice_fornitore4 LIKE ? OR
-        a.codice_fornitore5 LIKE ? OR
-        a.codice_fornitore6 LIKE ?
-      LIMIT 150
-    `;
-
-    const [searchResults] = await connection.query(searchQuery, [firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm, firstTerm]);
-    
-    if (searchResults.length === 0) {
-      connection.release();
-      return res.json({ success: true, data: [] });
-    }
-
-    // Step 2: recupera dettagli per articoli trovati con quantità basate su causale (come in magazzino)
-    const codici = searchResults.map(r => r.codice);
-    
-    const detailsQuery = `
       SELECT 
         a.codice,
         a.descrizione,
@@ -347,11 +321,21 @@ router.get('/articoli/search', async (req, res) => {
       FROM articoli a
       LEFT JOIN movimenti_magazzino m ON a.codice = m.articolo
       LEFT JOIN articoli_prezzi ap ON a.codice = ap.articolo AND ap.listino = 'BASE'
-      WHERE a.codice IN (${codici.map(() => '?').join(',')})
+      WHERE 
+        a.codice LIKE ? OR
+        a.descrizione LIKE ? OR
+        a.codice_a_barre LIKE ? OR
+        a.codice_fornitore LIKE ? OR
+        a.codice_fornitore2 LIKE ? OR
+        a.codice_fornitore3 LIKE ? OR
+        a.codice_fornitore4 LIKE ? OR
+        a.codice_fornitore5 LIKE ? OR
+        a.codice_fornitore6 LIKE ?
       GROUP BY a.codice, a.descrizione, a.colore, a.dimensioni, a.codice_fornitore, a.codice_fornitore2, a.codice_fornitore3, a.codice_fornitore4, a.codice_fornitore5, a.codice_fornitore6, ap.articolo, ap.listino, ap.prezzo, ap.sconto1, ap.sconto2
+      LIMIT 150
     `;
 
-    const [rows] = await connection.query(detailsQuery, codici);
+    const [rows] = await connection.query(searchQuery, [fullTerm, fullTerm, fullTerm, fullTerm, fullTerm, fullTerm, fullTerm, fullTerm, fullTerm]);
     connection.release();
 
     // Estrai marca, colore e taglia dalla descrizione

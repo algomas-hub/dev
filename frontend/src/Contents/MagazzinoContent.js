@@ -184,19 +184,45 @@ function MagazzinoContent() {
         </Typography>
 
         {/* Barra di Ricerca */}
-        <Paper sx={{ p: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+        <Paper sx={{ p: 0.75 }}>
+          <Box sx={{ display: 'flex', gap: 1, mb: 1, mt: -0.5 }}>
             <TextField
               ref={searchInputRef}
               fullWidth
               label="Ricerca Articoli"
-              variant="outlined"
+              variant="standard"
               size="small"
               value={searchTermine}
               onChange={(e) => setSearchTermine(e.target.value)}
               placeholder="Digita almeno 3 caratteri..."
               disabled={loading}
               autoFocus={true}
+              sx={{
+                '& .MuiInput-input': {
+                  color: '#FFFFFF',
+                  fontSize: '0.95rem',
+                  py: '3px',
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  opacity: 1,
+                },
+                '& .MuiInput-underline:before': {
+                  borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+                },
+                '& .MuiInput-underline:hover:before': {
+                  borderBottomColor: 'rgba(255, 255, 255, 0.4)',
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottomColor: '#FF9800',
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#FF9800',
+                },
+              }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
