@@ -71,7 +71,7 @@ function DashboardContent() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: '#000000'
+            backgroundColor: '#FFFFFF'
           }}>
             <img 
               src="/home-image.jpg" 
