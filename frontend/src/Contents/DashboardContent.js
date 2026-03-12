@@ -71,11 +71,10 @@ function DashboardContent() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: '#1a1a1a',
-            backgroundImage: 'linear-gradient(45deg, #2a2a2a 25%, #1a1a1a 25%, #1a1a1a 50%, #2a2a2a 50%, #2a2a2a 75%, #1a1a1a 75%, #1a1a1a)'
+            backgroundColor: '#000000'
           }}>
             <img 
-              src="/kala.png" 
+              src="/static/assets/kala.png" 
               alt="Home" 
               style={{
                 width: '100%',
