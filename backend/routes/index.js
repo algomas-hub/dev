@@ -45,7 +45,7 @@ const estraiDatiDescrizione = (descrizione) => {
 // Uso: GET /api/select?table=nome_tabella&limit=10
 router.get('/select', async (req, res) => {
   try {
-    const { table, limit = 100, offset = 0, where } = req.query;
+    const { table, limit = 10000, offset = 0, where } = req.query;
     
     if (!table) {
       return res.status(400).json({ error: 'Table name is required' });
@@ -468,7 +468,7 @@ router.get('/top-products', async (req, res) => {
 // Uso: GET /api/riparazioni/select?table=nome_tabella&limit=10
 router.get('/riparazioni/select', async (req, res) => {
   try {
-    const { table, limit = 100, offset = 0, where } = req.query;
+    const { table, limit = 10000, offset = 0, where } = req.query;
     
     if (!table) {
       return res.status(400).json({ error: 'Table name is required' });

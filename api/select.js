@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { table, limit = 100, offset = 0, where, id } = req.query;
+    const { table, limit = 999999, offset = 0, where, id } = req.query;
 
     if (!table) {
       return res.status(400).json({ error: 'Table name is required' });

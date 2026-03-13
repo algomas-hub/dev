@@ -60,6 +60,16 @@ export default function RiparazioniContent() {
   const [orderBy, setOrderBy] = useState('data_checkin');
   const [orderDirection, setOrderDirection] = useState('desc');
   const [statoCount, setStatoCount] = useState({});
+  const [openNewRepair, setOpenNewRepair] = useState(false);
+  const [newRepairData, setNewRepairData] = useState({
+    data_checkin: new Date().toISOString().split('T')[0],
+    cognome: '',
+    garanzia: false,
+    acconto: '',
+    problema_riscontrato: '',
+    accessori: ''
+  });
+  const [confirmSaveDialog, setConfirmSaveDialog] = useState(false);
   // Funzione per aprire il dialog e caricare la cronostoria
   const handleOpenHistory = async (row) => {
     setOpenHistory(true);
@@ -202,7 +212,7 @@ export default function RiparazioniContent() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${API_BASE_URL}/riparazioni/select?table=${TABLE_NAME}&limit=2000`);
+      const response = await fetch(`${API_BASE_URL}/riparazioni/select?table=${TABLE_NAME}`);
       const data = await response.json();
       
       if (data.success) {
@@ -282,6 +292,41 @@ export default function RiparazioniContent() {
       } catch (err) {
         setError('Errore: ' + err.message);
       }
+    }
+  };
+
+  const handleSaveNewRepair = async () => {
+    if (!newRepairData.cognome.trim()) {
+      setError('Il cognome è obbligatorio');
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/riparazioni/insert`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: TABLE_NAME,
+          data: newRepairData
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchRiparazioni();
+        setOpenNewRepair(false);
+        setNewRepairData({
+          data_checkin: new Date().toISOString().split('T')[0],
+          cognome: '',
+          garanzia: false,
+          acconto: '',
+          problema_riscontrato: '',
+          accessori: ''
+        });
+        setConfirmSaveDialog(false);
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError('Errore: ' + err.message);
     }
   };
 
@@ -399,15 +444,15 @@ export default function RiparazioniContent() {
       if (column === 'sostituite') {
         return (
           <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key="sostituite" sx={{ mb: 0.2 }}>
-            <TextField label="sostituite" value={formData['sostituite'] ?? ''} onChange={(e) => setFormData({ ...formData, ['sostituite']: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+            <TextField label="sostituite" value={formData.sostituite ?? ''} onChange={(e) => setFormData({ ...formData, sostituite: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
 
       if (column === 'accessori') {
         return (
-          <Grid item xs={12} key="accessori" sx={{ mb: 0.2 }}>
-            <TextField label="accessori" value={formData['accessori'] ?? ''} onChange={(e) => setFormData({ ...formData, ['accessori']: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+          <Grid item xs={12} key="accessori" sx={{ mb: 2 }}>
+            <TextField label="accessori" value={formData.accessori ?? ''} onChange={(e) => setFormData({ ...formData, accessori: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -424,9 +469,12 @@ export default function RiparazioniContent() {
       if (column === 'data_checkout') {
         const dateValue = formData['data_checkout'] ?? '';
         const formattedValue = dateValue ? (dateValue.includes('-') ? dateValue : dateValue.split('/').reverse().join('-')) : '';
+        const statoRiparazione = formData['stato_riparazione'] ?? '';
+        const isAutoFilled = ['CONSEGNATO', 'RESO AL CLIENTE', 'RIPARAZIONE NON ESEGUITA'].includes(statoRiparazione) && dateValue;
+        const isReadOnly = isAutoFilled || !editingId;
         return (
           <Grid item xs={12} sm={6} md={3} key="data_checkout" sx={{ mb: 0.2 }}>
-            <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={!editingId} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+            <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => !isReadOnly && setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={isReadOnly} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -434,7 +482,17 @@ export default function RiparazioniContent() {
       if (column === 'stato_riparazione') {
         return (
           <Grid item xs={12} sm={6} md={3} key="stato_riparazione" sx={{ mb: 0.2 }}>
-            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => setFormData({ ...formData, stato_riparazione: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => {
+              const newStato = e.target.value;
+              const updatedFormData = { ...formData, stato_riparazione: newStato };
+              if (['CONSEGNATO', 'RESO AL CLIENTE', 'RIPARAZIONE NON ESEGUITA'].includes(newStato) && !formData['data_checkout']) {
+                const today = new Date().toISOString().split('T')[0];
+                updatedFormData.data_checkout = today;
+              } else if (!['CONSEGNATO', 'RESO AL CLIENTE', 'RIPARAZIONE NON ESEGUITA'].includes(newStato)) {
+                updatedFormData.data_checkout = '';
+              }
+              setFormData(updatedFormData);
+            }} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               {statoOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}
             </TextField>
@@ -548,7 +606,7 @@ export default function RiparazioniContent() {
       {/* Card filtro stato e Nuova Riparazione in linea */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
-          {/* Card TUTTI */}
+          {/* Card TUTTI TRANNE CONSEGNATI */}
           <Card
             onClick={() => setStatoFilter('')}
             sx={{
@@ -557,8 +615,8 @@ export default function RiparazioniContent() {
               bgcolor: statoFilter === '' ? '#FF9800' : 'background.paper',
               color: 'white',
               minWidth: 70,
-              maxWidth: 90,
-              width: 90,
+              maxWidth: 130,
+              width: 130,
               height: 48,
               display: 'flex',
               flexDirection: 'column',
@@ -575,9 +633,9 @@ export default function RiparazioniContent() {
               },
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>TUTTI</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>TUTTI (NO CONS.)</Typography>
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '0.78rem', mt: 0.2 }}>
-              {riparazioni.length}
+              {riparazioni.length - (statoCount['CONSEGNATO'] || 0)}
             </Typography>
           </Card>
 
@@ -652,11 +710,11 @@ export default function RiparazioniContent() {
               <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary', mb: 0 }}>
                 Elenco Riparazioni
               </Typography>
-              <Button variant="contained" startIcon={<AddIcon />} disabled={loading}>
+              <Button variant="contained" startIcon={<AddIcon />} disabled={loading} onClick={() => setOpenNewRepair(true)}>
                 Nuova Riparazione
               </Button>
             </Box>
-            <TableContainer component={Card} sx={{ flex: 1, minHeight: 0, height: '100%', overflowY: 'auto', overflowX: 'auto', width: '100%' }}>
+            <TableContainer component={Card} sx={{ flex: 1, minHeight: 0, maxHeight: 'calc(100vh - 280px)', overflowY: 'auto', overflowX: 'auto', width: '100%' }}>
               <Table stickyHeader>
                 <TableHead>
                   <TableRow sx={{ backgroundColor: '#252525', height: '40px', position: 'sticky', top: 0, zIndex: 2 }}>
@@ -700,8 +758,8 @@ export default function RiparazioniContent() {
                       if (statoFilter && row.stato_riparazione !== statoFilter) {
                         return false;
                       }
-                      // Nascondi CONSEGNATO se viewAll è false
-                      if (!viewAll && row.stato_riparazione === 'CONSEGNATO') {
+                      // Nascondi CONSEGNATO solo se NON c'è un filtro attivo E viewAll è false
+                      if (!statoFilter && !viewAll && row.stato_riparazione === 'CONSEGNATO') {
                         return false;
                       }
                       return true;
@@ -970,7 +1028,10 @@ export default function RiparazioniContent() {
                       <>
                         <Button
                           variant="outlined"
-                          onClick={() => setEditingId(null)}
+                          onClick={() => {
+                            setFormData(selectedRow);
+                            setEditingId(null);
+                          }}
                           fullWidth
                           sx={{ fontSize: '0.85rem', py: 0.6, minWidth: 0 }}
                         >
@@ -1070,6 +1131,143 @@ export default function RiparazioniContent() {
           )}
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
             <Button onClick={() => setOpenHistoryDetail(false)} variant="contained" color="primary" size="small">Chiudi</Button>
+          </Box>
+        </Box>
+      </Dialog>
+
+      {/* Dialog Nuova Riparazione */}
+      <Dialog open={openNewRepair} onClose={() => setOpenNewRepair(false)} fullWidth maxWidth="sm">
+        <Box sx={{ bgcolor: '#1E1E1E', borderBottom: '2px solid #FF9800', p: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: '#FF9800' }}>
+            Nuova Riparazione
+          </Typography>
+        </Box>
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+            label="data_checkin"
+            type="date"
+            value={newRepairData.data_checkin}
+            onChange={(e) => setNewRepairData({ ...newRepairData, data_checkin: e.target.value })}
+            InputLabelProps={{ shrink: true, style: { color: 'grey' } }}
+            fullWidth
+            size="small"
+            sx={{ 
+              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' },
+              '& .MuiOutlinedInput-root': { color: 'white' }
+            }}
+          />
+          <TextField
+            label="cognome"
+            value={newRepairData.cognome}
+            onChange={(e) => setNewRepairData({ ...newRepairData, cognome: e.target.value })}
+            fullWidth
+            size="small"
+            required
+            error={newRepairData.cognome === ''}
+            helperText={newRepairData.cognome === '' ? 'Campo obbligatorio' : ''}
+            InputLabelProps={{ style: { color: 'grey' } }}
+            sx={{ 
+              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
+            }}
+            autoComplete="off"
+          />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={newRepairData.garanzia}
+                  onChange={(e) => setNewRepairData({ ...newRepairData, garanzia: e.target.checked })}
+                  sx={{ color: 'orange' }}
+                />
+              }
+              label={<span style={{ fontSize: '0.9rem', color: 'grey', fontWeight: 600 }}>garanzia</span>}
+            />
+          </Box>
+          <TextField
+            label="acconto"
+            type="text"
+            value={newRepairData.acconto}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || !isNaN(parseFloat(value))) {
+                setNewRepairData({ ...newRepairData, acconto: value });
+              }
+            }
+            }
+            fullWidth
+            size="small"
+            InputLabelProps={{ style: { color: 'grey' } }}
+            sx={{ 
+              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
+            }}
+            placeholder="0.00"
+          />
+          <TextField
+            label="problema_riscontrato"
+            value={newRepairData.problema_riscontrato}
+            onChange={(e) => setNewRepairData({ ...newRepairData, problema_riscontrato: e.target.value })}
+            fullWidth
+            multiline
+            rows={3}
+            size="small"
+            InputLabelProps={{ style: { color: 'grey' } }}
+            sx={{ 
+              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
+            }}
+          />
+          <TextField
+            label="accessori"
+            value={newRepairData.accessori}
+            onChange={(e) => setNewRepairData({ ...newRepairData, accessori: e.target.value })}
+            fullWidth
+            multiline
+            rows={3}
+            size="small"
+            InputLabelProps={{ style: { color: 'grey' } }}
+            sx={{ 
+              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
+            }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2, p: 2, justifyContent: 'flex-end', bgcolor: '#1E1E1E', borderTop: '1px solid #333' }}>
+          <Button 
+            variant="outlined" 
+            onClick={() => setOpenNewRepair(false)}
+            sx={{ color: '#FF9800', borderColor: '#FF9800' }}
+          >
+            Annulla
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={() => setConfirmSaveDialog(true)}
+            sx={{ bgcolor: '#FF9800', color: '#000' }}
+          >
+            Salva
+          </Button>
+        </Box>
+      </Dialog>
+
+      {/* Dialog Conferma Salvataggio */}
+      <Dialog open={confirmSaveDialog} onClose={() => setConfirmSaveDialog(false)}>
+        <Box sx={{ bgcolor: '#1E1E1E', p: 2 }}>
+          <Typography sx={{ color: 'white', mb: 3 }}>
+            Sei sicuro di voler salvare la nuova riparazione?
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button 
+              variant="outlined" 
+              onClick={() => setConfirmSaveDialog(false)}
+              sx={{ color: '#FF9800', borderColor: '#FF9800' }}
+            >
+              No
+            </Button>
+            <Button 
+              variant="contained" 
+              onClick={handleSaveNewRepair}
+              sx={{ bgcolor: '#FF9800', color: '#000' }}
+            >
+              Sì
+            </Button>
           </Box>
         </Box>
       </Dialog>
