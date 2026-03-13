@@ -51,7 +51,11 @@ router.get('/select', async (req, res) => {
       return res.status(400).json({ error: 'Table name is required' });
     }
 
-    const connection = await pool.getConnection();
+    // Usa poolRiparazioni per tabelle di riparazioni, altrimenti pool
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     let query = `SELECT * FROM \`${table}\` LIMIT ? OFFSET ?`;
     let params = [parseInt(limit), parseInt(offset)];
 
@@ -61,7 +65,22 @@ router.get('/select', async (req, res) => {
 
     const [rows] = await connection.query(query, params);
     connection.release();
-    res.json({ success: true, data: rows });
+    
+    // Formatta date per tabella riparazioni
+    let formattedRows = rows;
+    if (isRiparazioni && table === 'riparazioni') {
+      formattedRows = rows.map(row => {
+        if (row.data_checkin instanceof Date) {
+          row.data_checkin = row.data_checkin.toISOString().split('T')[0];
+        }
+        if (row.data_checkout instanceof Date) {
+          row.data_checkout = row.data_checkout.toISOString().split('T')[0];
+        }
+        return row;
+      });
+    }
+    
+    res.json({ success: true, data: formattedRows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -72,7 +91,12 @@ router.get('/select', async (req, res) => {
 router.get('/select/:table/:id', async (req, res) => {
   try {
     const { table, id } = req.params;
-    const connection = await pool.getConnection();
+    
+    // Usa poolRiparazioni per tabelle di riparazioni, altrimenti pool
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+    
+    const connection = await selectedPool.getConnection();
     
     const [rows] = await connection.query(
       `SELECT * FROM \`${table}\` WHERE id = ?`,
@@ -83,7 +107,19 @@ router.get('/select/:table/:id', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Record not found' });
     }
-    res.json({ success: true, data: rows[0] });
+    
+    let row = rows[0];
+    // Formatta date per tabella riparazioni
+    if (isRiparazioni && table === 'riparazioni') {
+      if (row.data_checkin instanceof Date) {
+        row.data_checkin = row.data_checkin.toISOString().split('T')[0];
+      }
+      if (row.data_checkout instanceof Date) {
+        row.data_checkout = row.data_checkout.toISOString().split('T')[0];
+      }
+    }
+    
+    res.json({ success: true, data: row });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -99,9 +135,21 @@ router.post('/insert', async (req, res) => {
       return res.status(400).json({ error: 'Table name and data are required' });
     }
 
-    const connection = await pool.getConnection();
+    // Usa poolRiparazioni per tabelle di riparazioni, altrimenti pool
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     const columns = Object.keys(data);
-    const values = Object.values(data);
+    
+    // Converti stringhe vuote a NULL per i campi data in riparazioni
+    const values = isRiparazioni ? Object.entries(data).map(([key, value]) => {
+      if ((key === 'data_checkout' || key === 'data_checkin') && (value === '' || value === null)) {
+        return null;
+      }
+      return value;
+    }) : Object.values(data);
+    
     const placeholders = columns.map(() => '?').join(',');
     
     const query = `INSERT INTO \`${table}\` (${columns.map(c => `\`${c}\``).join(',')}) VALUES (${placeholders})`;
@@ -129,14 +177,25 @@ router.put('/update', async (req, res) => {
       return res.status(400).json({ error: 'Table name, id, and data are required' });
     }
 
-    const connection = await pool.getConnection();
+    // Usa poolRiparazioni per tabelle di riparazioni, altrimenti pool
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     const columns = Object.keys(data);
-    const values = Object.values(data);
+    
+    // Converti stringhe vuote a NULL per i campi data in riparazioni
+    const dataValues = isRiparazioni ? Object.entries(data).map(([key, value]) => {
+      if ((key === 'data_checkout' || key === 'data_checkin') && (value === '' || value === null)) {
+        return null;
+      }
+      return value;
+    }) : Object.values(data);
     
     const setClause = columns.map(c => `\`${c}\` = ?`).join(',');
     const query = `UPDATE \`${table}\` SET ${setClause} WHERE id = ?`;
     
-    const [result] = await connection.query(query, [...values, id]);
+    const [result] = await connection.query(query, [...dataValues, id]);
     connection.release();
     
     res.json({ 
@@ -159,7 +218,11 @@ router.delete('/delete', async (req, res) => {
       return res.status(400).json({ error: 'Table name and id are required' });
     }
 
-    const connection = await pool.getConnection();
+    // Usa poolRiparazioni per tabelle di riparazioni, altrimenti pool
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     const [result] = await connection.query(
       `DELETE FROM \`${table}\` WHERE id = ?`,
       [id]
@@ -170,6 +233,69 @@ router.delete('/delete', async (req, res) => {
       success: true, 
       message: 'Data deleted successfully',
       affectedRows: result.affectedRows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Recupera valori DISTINCT di un campo
+// Uso: GET /api/distinct?table=nome_tabella&field=nome_campo
+router.get('/distinct', async (req, res) => {
+  try {
+    const { table, field } = req.query;
+
+    if (!table || !field) {
+      return res.status(400).json({ error: 'Table name and field are required' });
+    }
+
+    // Usa poolRiparazioni per tabelle di riparazioni, altrimenti pool
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
+    const [rows] = await connection.query(
+      `SELECT DISTINCT \`${field}\` FROM \`${table}\` ORDER BY \`${field}\``
+    );
+    connection.release();
+    
+    res.json({ 
+      success: true, 
+      data: rows.map(row => row[field])
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Cronologia riparazioni per cliente
+// Uso: GET /api/history?cognome=ROSSI
+router.get('/history', async (req, res) => {
+  try {
+    const { cognome } = req.query;
+
+    if (!cognome) {
+      return res.status(400).json({ error: 'cognome parameter is required' });
+    }
+
+    const connection = await poolRiparazioni.getConnection();
+    const [storico] = await connection.query(
+      'SELECT id, data_checkin as data, stato_riparazione as stato, problema_riscontrato, modello FROM riparazioni WHERE cognome = ? ORDER BY data_checkin DESC',
+      [cognome]
+    );
+    connection.release();
+    
+    // Format dates
+    const formattedData = storico.map(row => {
+      if (row.data instanceof Date) {
+        row.data = row.data.toISOString().split('T')[0];
+      }
+      return row;
+    });
+    
+    res.json({ 
+      success: true, 
+      data: formattedData
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

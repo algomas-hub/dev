@@ -56,6 +56,7 @@ export default function RiparazioniContent() {
   const [columns, setColumns] = useState([]);
   const [statoFilter, setStatoFilter] = useState('');
   const [statoOptions, setStatoOptions] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [viewAll, setViewAll] = useState(false);
   const [orderBy, setOrderBy] = useState('data_checkin');
   const [orderDirection, setOrderDirection] = useState('desc');
@@ -842,6 +843,7 @@ export default function RiparazioniContent() {
                             padding: '4px',
                             borderBottom: '1px solid #333333',
                             backgroundColor: column === 'stato_riparazione' ? getRowBackgroundColor(row.stato_riparazione) : 'inherit',
+                            textAlign: column === 'cliente_avvisato' ? 'center' : 'left',
                           }}>
                           {column === 'cliente_avvisato' ? (
                             row[column] === 1 ? (
