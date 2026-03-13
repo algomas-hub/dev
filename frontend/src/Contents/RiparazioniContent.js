@@ -22,6 +22,7 @@ import {
   TableSortLabel,
   Dialog,
   Paper,
+  MenuItem,
 } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import AddIcon from '@mui/icons-material/Add';
@@ -323,14 +324,20 @@ export default function RiparazioniContent() {
               fullWidth
               size="small"
               disabled={!editingId}
-              InputLabelProps={{ style: { fontSize: '0.85rem', fontWeight: 700, letterSpacing: 0.2, color: 'grey', textShadow: '0 1px 3px #000, 0 0px 1px #222', WebkitTextStroke: '0.2px #222', paddingTop: idx < 4 ? '8px' : undefined } }}
-              inputProps={{ style: { fontSize: '0.83rem', padding: '10px 6px 4px 6px', color: 'white' } }}
-              sx={{ mb: 0.2 }}
+              inputProps={{ style: { fontSize: '0.9rem' } }}
+              InputLabelProps={{ style: { color: 'grey' } }}
+              sx={{
+                mb: 0.2,
+                '& .MuiOutlinedInput-input.Mui-disabled': {
+                  color: 'white',
+                  WebkitTextFillColor: 'white !important'
+                }
+              }}
             >
-              <option value=""> </option>
-              <option value="DMR">DMR</option>
-              <option value="CQB">CQB</option>
-              <option value="SMG">SMG</option>
+              <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
+              <MenuItem value="DMR">DMR</MenuItem>
+              <MenuItem value="CQB">CQB</MenuItem>
+              <MenuItem value="SMG">SMG</MenuItem>
             </TextField>
           </Grid>
         );
@@ -345,13 +352,19 @@ export default function RiparazioniContent() {
               fullWidth
               size="small"
               disabled={!editingId}
-              InputLabelProps={{ style: { fontSize: '0.85rem', fontWeight: 700, letterSpacing: 0.2, color: 'grey', textShadow: '0 1px 3px #000, 0 0px 1px #222', WebkitTextStroke: '0.2px #222', paddingTop: idx < 4 ? '8px' : undefined } }}
-              inputProps={{ style: { fontSize: '0.83rem', padding: '10px 6px 4px 6px', color: 'white' } }}
-              sx={{ mb: 0.2 }}
+              inputProps={{ style: { fontSize: '0.9rem' } }}
+              InputLabelProps={{ style: { color: 'grey' } }}
+              sx={{
+                mb: 0.2,
+                '& .MuiOutlinedInput-input.Mui-disabled': {
+                  color: 'white',
+                  WebkitTextFillColor: 'white !important'
+                }
+              }}
             >
-              <option value=""> </option>
-              <option value="OPEN">OPEN</option>
-              <option value="CLOSE">CLOSE</option>
+              <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
+              <MenuItem value="OPEN">OPEN</MenuItem>
+              <MenuItem value="CLOSE">CLOSE</MenuItem>
             </TextField>
           </Grid>
         );
@@ -373,7 +386,7 @@ export default function RiparazioniContent() {
       if (column === 'sostituite') {
         return (
           <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key="sostituite" sx={{ mb: 0.2 }}>
-            <TextField label="sostituite" value={formData['sostituite'] ?? ''} onChange={(e) => setFormData({ ...formData, ['sostituite']: e.target.value })} fullWidth size="small" disabled={!editingId} sx={{ mb: 0.2 }} />
+            <TextField label="sostituite" value={formData['sostituite'] ?? ''} onChange={(e) => setFormData({ ...formData, ['sostituite']: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -381,7 +394,7 @@ export default function RiparazioniContent() {
       if (column === 'accessori') {
         return (
           <Grid item xs={12} key="accessori" sx={{ mb: 0.2 }}>
-            <TextField label="accessori" value={formData['accessori'] ?? ''} onChange={(e) => setFormData({ ...formData, ['accessori']: e.target.value })} fullWidth size="small" disabled={!editingId} sx={{ mb: 0.2 }} />
+            <TextField label="accessori" value={formData['accessori'] ?? ''} onChange={(e) => setFormData({ ...formData, ['accessori']: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -398,8 +411,9 @@ export default function RiparazioniContent() {
       if (column === 'stato_riparazione') {
         return (
           <Grid item xs={12} sm={6} md={3} key="stato_riparazione" sx={{ mb: 0.2 }}>
-            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => setFormData({ ...formData, stato_riparazione: e.target.value })} fullWidth size="small" disabled={!editingId} sx={{ mb: 0.2 }}>
-              {statoOptions.map(option => (<option key={option} value={option}>{option}</option>))}
+            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => setFormData({ ...formData, stato_riparazione: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+              <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
+              {statoOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}
             </TextField>
           </Grid>
         );
@@ -416,10 +430,10 @@ export default function RiparazioniContent() {
       if (column === 'statohpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} sx={{ mb: 0.2 }}>
-              <option value=""> </option>
-              <option value="VENDUTO">VENDUTO</option>
-              <option value="CASA">CASA</option>
+            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+              <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
+              <MenuItem value="VENDUTO">VENDUTO</MenuItem>
+              <MenuItem value="CASA">CASA</MenuItem>
             </TextField>
           </Grid>
         );
@@ -428,13 +442,13 @@ export default function RiparazioniContent() {
       if (column === 'enginehpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} sx={{ mb: 0.2 }}>
-              <option value=""> </option>
-              <option value="INFERNO">INFERNO</option>
-              <option value="AAP01">AAP01</option>
-              <option value="POLASTAR">POLASTAR</option>
-              <option value="PULSAR">PULSAR</option>
-              <option value="ALTRO">ALTRO</option>
+            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+              <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
+              <MenuItem value="INFERNO">INFERNO</MenuItem>
+              <MenuItem value="AAP01">AAP01</MenuItem>
+              <MenuItem value="POLASTAR">POLASTAR</MenuItem>
+              <MenuItem value="PULSAR">PULSAR</MenuItem>
+              <MenuItem value="ALTRO">ALTRO</MenuItem>
             </TextField>
           </Grid>
         );
@@ -458,7 +472,7 @@ export default function RiparazioniContent() {
 
       return (
         <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-          <TextField label={column} value={formData[column] ?? ''} onChange={(e) => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} sx={{ mb: 0.2 }} />
+          <TextField label={column} value={formData[column] ?? ''} onChange={(e) => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
         </Grid>
       );
     };
@@ -468,9 +482,9 @@ export default function RiparazioniContent() {
     if (hpaFields.length > 0) {
       renderedHpaFields = (
         <Grid item xs={12} md={12} lg={12} xl={12} sx={{ mb: 1.5, mt: 0.5 }}>
-          <Box sx={{ border: '2px solid orange', borderRadius: 2, p: 1, width: '100%', overflowX: 'visible' }}>
+          <Box sx={{ border: '2px solid orange', borderRadius: 2, p: 1, width: '100%', overflow: 'visible', position: 'relative', zIndex: 10 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'orange', mb: 1, fontSize: '1.01rem' }}>HPA</Typography>
-            <Grid container spacing={0.7}>
+            <Grid container spacing={0.7} sx={{ overflow: 'visible', position: 'relative' }}>
               {hpaFields.map((col, idx) => renderField(col, idx))}
             </Grid>
           </Box>
@@ -833,10 +847,10 @@ export default function RiparazioniContent() {
               Dettagli Riparazione
             </Typography>
             {selectedRow ? (
-              <Card sx={{ bgcolor: 'background.paper', flex: '0 1 800px', maxHeight: 800, overflow: 'auto', minHeight: 0, boxShadow: 2, borderRadius: 2 }}>
-                <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', p: 1.2 }}>
-                  <Box sx={{ flex: 1, overflow: 'auto', pr: 0.5 }}>
-                    <Grid container spacing={0.7}>
+              <Card sx={{ bgcolor: 'background.paper', flex: '0 1 800px', maxHeight: 800, minHeight: 0, boxShadow: 2, borderRadius: 2, overflow: 'hidden' }}>
+                <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', p: 1.2, overflow: 'hidden' }}>
+                  <Box sx={{ flex: 1, overflowY: 'auto', pr: 0.5, overflowX: 'visible' }}>
+                    <Grid container spacing={0.7} sx={{ pt: 2 }}>
                       {/* Altri campi tranne problema_riscontrato e foto */}
                       {computeFormFields()} 
                       {columns.includes('foto') && columns.includes('problema_riscontrato') && (
