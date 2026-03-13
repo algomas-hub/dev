@@ -484,7 +484,21 @@ router.get('/riparazioni/select', async (req, res) => {
 
     const [rows] = await connection.query(query, params);
     connection.release();
-    res.json({ success: true, data: rows });
+    
+    // Formatta le date al formato YYYY-MM-DD per il date picker
+    const formattedRows = rows.map(row => {
+      const formattedRow = { ...row };
+      if (formattedRow.data_checkin && typeof formattedRow.data_checkin === 'object') {
+        // Se è un oggetto Date, convertilo a stringa YYYY-MM-DD
+        formattedRow.data_checkin = formattedRow.data_checkin.toISOString().split('T')[0];
+      }
+      if (formattedRow.data_checkout && typeof formattedRow.data_checkout === 'object') {
+        formattedRow.data_checkout = formattedRow.data_checkout.toISOString().split('T')[0];
+      }
+      return formattedRow;
+    });
+    
+    res.json({ success: true, data: formattedRows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -506,7 +520,17 @@ router.get('/riparazioni/select/:table/:id', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Record not found' });
     }
-    res.json({ success: true, data: rows[0] });
+    
+    // Formatta le date al formato YYYY-MM-DD per il date picker
+    const row = rows[0];
+    if (row.data_checkin && typeof row.data_checkin === 'object') {
+      row.data_checkin = row.data_checkin.toISOString().split('T')[0];
+    }
+    if (row.data_checkout && typeof row.data_checkout === 'object') {
+      row.data_checkout = row.data_checkout.toISOString().split('T')[0];
+    }
+    
+    res.json({ success: true, data: row });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -554,7 +578,13 @@ router.put('/riparazioni/update', async (req, res) => {
 
     const connection = await poolRiparazioni.getConnection();
     const columns = Object.keys(data);
-    const values = Object.values(data);
+    // Converti stringhe vuote a NULL per i campi data
+    const values = Object.entries(data).map(([key, value]) => {
+      if ((key === 'data_checkout' || key === 'data_checkin') && (value === '' || value === null)) {
+        return null;
+      }
+      return value;
+    });
     
     const setClause = columns.map(c => `\`${c}\` = ?`).join(',');
     const query = `UPDATE \`${table}\` SET ${setClause} WHERE id = ?`;

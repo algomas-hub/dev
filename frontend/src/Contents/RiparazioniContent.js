@@ -70,6 +70,7 @@ export default function RiparazioniContent() {
     accessori: ''
   });
   const [confirmSaveDialog, setConfirmSaveDialog] = useState(false);
+  const [validationErrorDialog, setValidationErrorDialog] = useState(false);
   // Funzione per aprire il dialog e caricare la cronostoria
   const handleOpenHistory = async (row) => {
     setOpenHistory(true);
@@ -240,7 +241,23 @@ export default function RiparazioniContent() {
 
   const handleSelectRow = (row) => {
     setSelectedRow(row);
-    setFormData(row);
+    // Normalizza le date al formato ISO YYYY-MM-DD per il date picker
+    const convertedRow = { ...row };
+    if (convertedRow.data_checkin) {
+      if (convertedRow.data_checkin.includes('/')) {
+        // Formato gg/mm/aaaa -> aaaa-mm-gg
+        convertedRow.data_checkin = convertedRow.data_checkin.split('/').reverse().join('-');
+      }
+      // Se è già nel formato YYYY-MM-DD, lascialo come è
+    }
+    if (convertedRow.data_checkout) {
+      if (convertedRow.data_checkout.includes('/')) {
+        // Formato gg/mm/aaaa -> aaaa-mm-gg
+        convertedRow.data_checkout = convertedRow.data_checkout.split('/').reverse().join('-');
+      }
+      // Se è già nel formato YYYY-MM-DD, lascialo come è
+    }
+    setFormData(convertedRow);
     setEditingId(null);
   };
 
@@ -297,7 +314,7 @@ export default function RiparazioniContent() {
 
   const handleSaveNewRepair = async () => {
     if (!newRepairData.cognome.trim()) {
-      setError('Il cognome è obbligatorio');
+      setValidationErrorDialog(true);
       return;
     }
     try {
@@ -466,12 +483,32 @@ export default function RiparazioniContent() {
         );
       }
 
+      if (column === 'data_checkin') {
+        const dateValue = formData['data_checkin'] ?? '';
+        // Il database restituisce formato YYYY-MM-DD, che è quello che vuole il date picker
+        let formattedValue = dateValue;
+        if (dateValue && dateValue.includes('/')) {
+          // Se per qualche motivo arriva in formato gg/mm/aaaa, convertilo
+          formattedValue = dateValue.split('/').reverse().join('-');
+        }
+        return (
+          <Grid item xs={12} sm={6} md={3} key="data_checkin" sx={{ mb: 0.2 }}>
+            <TextField type="date" label="data_checkin" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkin: e.target.value })} fullWidth size="small" disabled={!editingId} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+          </Grid>
+        );
+      }
+
       if (column === 'data_checkout') {
         const dateValue = formData['data_checkout'] ?? '';
-        const formattedValue = dateValue ? (dateValue.includes('-') ? dateValue : dateValue.split('/').reverse().join('-')) : '';
         const statoRiparazione = formData['stato_riparazione'] ?? '';
         const isAutoFilled = ['CONSEGNATO', 'RESO AL CLIENTE', 'RIPARAZIONE NON ESEGUITA'].includes(statoRiparazione) && dateValue;
         const isReadOnly = isAutoFilled || !editingId;
+        // Il database restituisce formato YYYY-MM-DD, che è quello che vuole il date picker
+        let formattedValue = dateValue;
+        if (dateValue && dateValue.includes('/')) {
+          // Se per qualche motivo arriva in formato gg/mm/aaaa, convertilo
+          formattedValue = dateValue.split('/').reverse().join('-');
+        }
         return (
           <Grid item xs={12} sm={6} md={3} key="data_checkout" sx={{ mb: 0.2 }}>
             <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => !isReadOnly && setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={isReadOnly} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
@@ -635,7 +672,7 @@ export default function RiparazioniContent() {
           >
             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>TUTTI (NO CONS.)</Typography>
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '0.78rem', mt: 0.2 }}>
-              {riparazioni.length - (statoCount['CONSEGNATO'] || 0)}
+              {riparazioni.length - (statoCount['CONSEGNATO'] || 0) - (statoCount['RESO AL CLIENTE'] || 0)}
             </Typography>
           </Card>
 
@@ -758,8 +795,8 @@ export default function RiparazioniContent() {
                       if (statoFilter && row.stato_riparazione !== statoFilter) {
                         return false;
                       }
-                      // Nascondi CONSEGNATO solo se NON c'è un filtro attivo E viewAll è false
-                      if (!statoFilter && !viewAll && row.stato_riparazione === 'CONSEGNATO') {
+                      // Nascondi CONSEGNATO e RESO AL CLIENTE solo se NON c'è un filtro attivo E viewAll è false
+                      if (!statoFilter && !viewAll && (row.stato_riparazione === 'CONSEGNATO' || row.stato_riparazione === 'RESO AL CLIENTE')) {
                         return false;
                       }
                       return true;
@@ -1029,7 +1066,19 @@ export default function RiparazioniContent() {
                         <Button
                           variant="outlined"
                           onClick={() => {
-                            setFormData(selectedRow);
+                            // Normalizza le date al formato ISO YYYY-MM-DD per il date picker
+                            const convertedRow = { ...selectedRow };
+                            if (convertedRow.data_checkin) {
+                              if (convertedRow.data_checkin.includes('/') && /^\d{2}\/\d{2}\/\d{4}/.test(convertedRow.data_checkin)) {
+                                convertedRow.data_checkin = convertedRow.data_checkin.split('/').reverse().join('-');
+                              }
+                            }
+                            if (convertedRow.data_checkout) {
+                              if (convertedRow.data_checkout.includes('/') && /^\d{2}\/\d{2}\/\d{4}/.test(convertedRow.data_checkout)) {
+                                convertedRow.data_checkout = convertedRow.data_checkout.split('/').reverse().join('-');
+                              }
+                            }
+                            setFormData(convertedRow);
                             setEditingId(null);
                           }}
                           fullWidth
@@ -1163,8 +1212,6 @@ export default function RiparazioniContent() {
             fullWidth
             size="small"
             required
-            error={newRepairData.cognome === ''}
-            helperText={newRepairData.cognome === '' ? 'Campo obbligatorio' : ''}
             InputLabelProps={{ style: { color: 'grey' } }}
             sx={{ 
               '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
@@ -1192,15 +1239,21 @@ export default function RiparazioniContent() {
               if (value === '' || !isNaN(parseFloat(value))) {
                 setNewRepairData({ ...newRepairData, acconto: value });
               }
-            }
-            }
-            fullWidth
+            }}
             size="small"
             InputLabelProps={{ style: { color: 'grey' } }}
-            sx={{ 
-              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
+            InputProps={{
+              endAdornment: (
+                <span style={{ color: '#FF9800', fontWeight: 700, fontSize: '1.1rem', marginLeft: 4, paddingRight: 8 }}>€</span>
+              ),
+              style: { color: 'white', fontSize: '0.9rem', width: 130, paddingRight: 0 }
+            }}
+            sx={{
+              width: 140,
+              '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem', paddingRight: 0 }
             }}
             placeholder="0.00"
+            autoComplete="off"
           />
           <TextField
             label="problema_riscontrato"
@@ -1267,6 +1320,27 @@ export default function RiparazioniContent() {
               sx={{ bgcolor: '#FF9800', color: '#000' }}
             >
               Sì
+            </Button>
+          </Box>
+        </Box>
+      </Dialog>
+
+      {/* Dialog Validazione Cognome */}
+      <Dialog open={validationErrorDialog} onClose={() => setValidationErrorDialog(false)}>
+        <Box sx={{ bgcolor: '#1E1E1E', p: 3, minWidth: 300 }}>
+          <Typography sx={{ color: '#FF6B6B', mb: 3, fontWeight: 700, fontSize: '1.1rem', textAlign: 'center' }}>
+            ⚠️ Errore
+          </Typography>
+          <Typography sx={{ color: 'white', mb: 3, textAlign: 'center', fontSize: '0.95rem' }}>
+            Compila il cognome
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Button 
+              variant="contained" 
+              onClick={() => setValidationErrorDialog(false)}
+              sx={{ bgcolor: '#FF9800', color: '#000', fontWeight: 700 }}
+            >
+              Chiudi
             </Button>
           </Box>
         </Box>
