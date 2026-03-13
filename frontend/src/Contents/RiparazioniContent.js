@@ -286,7 +286,7 @@ export default function RiparazioniContent() {
   };
 
   const computeFormFields = () => {
-    const otherFields = columns.filter(col => col !== 'problema_riscontrato' && col !== 'foto' && col !== 'hpa' && col !== 'wraithhpa' && col !== 'accessori' && col !== 'cliente_avvisato' && col !== 'garanzia' && col !== 'camo' && col !== 'camp' && col !== 'id');
+    const otherFields = columns.filter(col => col !== 'problema_riscontrato' && col !== 'foto' && col !== 'hpa' && col !== 'wraithhpa' && col !== 'accessori' && col !== 'cliente_avvisato' && col !== 'data_checkout' && col !== 'garanzia' && col !== 'camo' && col !== 'camp' && col !== 'id');
     const sostituiteIdx = otherFields.indexOf('sostituite');
     let fieldsOrder = [...otherFields];
     if (sostituiteIdx !== -1) {
@@ -296,6 +296,7 @@ export default function RiparazioniContent() {
       if (columns.includes('garanzia')) fieldsOrder.splice(insertIdx++, 0, 'garanzia');
       let garCli = [];
       if (columns.includes('cliente_avvisato')) garCli.push('cliente_avvisato');
+      if (columns.includes('data_checkout')) garCli.push('data_checkout');
       if (garCli.length > 0) fieldsOrder.splice(insertIdx++, 0, garCli);
       if (columns.includes('hpa')) fieldsOrder.splice(insertIdx++, 0, 'hpa');
       if (columns.includes('wraithhpa')) fieldsOrder.splice(insertIdx++, 0, 'wraithhpa');
@@ -305,6 +306,7 @@ export default function RiparazioniContent() {
       if (columns.includes('camo')) fieldsOrder.push('camo');
       let garCli = [];
       if (columns.includes('cliente_avvisato')) garCli.push('cliente_avvisato');
+      if (columns.includes('data_checkout')) garCli.push('data_checkout');
       if (garCli.length > 0) fieldsOrder.push(garCli);
       if (columns.includes('hpa')) fieldsOrder.push('hpa');
       if (columns.includes('wraithhpa')) fieldsOrder.push('wraithhpa');
@@ -324,7 +326,7 @@ export default function RiparazioniContent() {
               fullWidth
               size="small"
               disabled={!editingId}
-              inputProps={{ style: { fontSize: '0.9rem' } }}
+              inputProps={{ style: { fontSize: '0.7rem' } }}
               InputLabelProps={{ style: { color: 'grey' } }}
               sx={{
                 mb: 0.2,
@@ -352,7 +354,7 @@ export default function RiparazioniContent() {
               fullWidth
               size="small"
               disabled={!editingId}
-              inputProps={{ style: { fontSize: '0.9rem' } }}
+              inputProps={{ style: { fontSize: '0.7rem' } }}
               InputLabelProps={{ style: { color: 'grey' } }}
               sx={{
                 mb: 0.2,
@@ -379,6 +381,17 @@ export default function RiparazioniContent() {
             <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
               <FormControlLabel control={<Checkbox checked={!!formData['cliente_avvisato']} onChange={e => editingId && setFormData({ ...formData, cliente_avvisato: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>cliente avvisato</span>} sx={{ ml: 0.5, mb: 0.2 }} />
             </Grid>
+            {column.includes('data_checkout') && (
+              <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
+                {(() => {
+                  const dateValue = formData['data_checkout'] ?? '';
+                  const formattedValue = dateValue ? (dateValue.includes('-') ? dateValue : dateValue.split('/').reverse().join('-')) : '';
+                  return (
+                    <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+                  );
+                })()}
+              </Grid>
+            )}
           </Grid>
         );
       }
@@ -408,10 +421,20 @@ export default function RiparazioniContent() {
         );
       }
 
+      if (column === 'data_checkout') {
+        const dateValue = formData['data_checkout'] ?? '';
+        const formattedValue = dateValue ? (dateValue.includes('-') ? dateValue : dateValue.split('/').reverse().join('-')) : '';
+        return (
+          <Grid item xs={12} sm={6} md={3} key="data_checkout" sx={{ mb: 0.2 }}>
+            <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={!editingId} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+          </Grid>
+        );
+      }
+
       if (column === 'stato_riparazione') {
         return (
           <Grid item xs={12} sm={6} md={3} key="stato_riparazione" sx={{ mb: 0.2 }}>
-            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => setFormData({ ...formData, stato_riparazione: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => setFormData({ ...formData, stato_riparazione: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               {statoOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}
             </TextField>
@@ -472,7 +495,7 @@ export default function RiparazioniContent() {
 
       return (
         <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-          <TextField label={column} value={formData[column] ?? ''} onChange={(e) => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+          <TextField label={column} value={formData[column] ?? ''} onChange={(e) => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.8rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
         </Grid>
       );
     };
