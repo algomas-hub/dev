@@ -1,4 +1,4 @@
-const { pool, corsHeaders, handleCors, handleError } = require('./utils');
+const { pool, poolRiparazioni, corsHeaders, handleCors, handleError } = require('./utils');
 
 module.exports = async (req, res) => {
   Object.entries(corsHeaders).forEach(([key, val]) => {
@@ -21,7 +21,11 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Table name is required' });
     }
 
-    const connection = await pool.getConnection();
+    // Determine which database pool to use
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     let query;
     let params;
 
@@ -43,10 +47,24 @@ module.exports = async (req, res) => {
       return res.status(404).json({ error: 'Record not found' });
     }
 
+    // Format dates for riparazioni table
+    let formattedRows = rows;
+    if (isRiparazioni && table === 'riparazioni') {
+      formattedRows = rows.map(row => {
+        if (row.data_checkin instanceof Date) {
+          row.data_checkin = row.data_checkin.toISOString().split('T')[0];
+        }
+        if (row.data_checkout instanceof Date) {
+          row.data_checkout = row.data_checkout.toISOString().split('T')[0];
+        }
+        return row;
+      });
+    }
+
     res.status(200).json({ 
       success: true, 
-      data: id ? rows[0] : rows,
-      count: rows.length
+      data: id ? formattedRows[0] : formattedRows,
+      count: formattedRows.length
     });
   } catch (error) {
     handleError(res, error);

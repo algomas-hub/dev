@@ -1,4 +1,4 @@
-const { pool, corsHeaders, handleCors, handleError } = require('./utils');
+const { pool, poolRiparazioni, corsHeaders, handleCors, handleError } = require('./utils');
 
 module.exports = async (req, res) => {
   Object.entries(corsHeaders).forEach(([key, val]) => {
@@ -21,9 +21,19 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Table name and data are required' });
     }
 
-    const connection = await pool.getConnection();
+    // Determine which database pool to use
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     const columns = Object.keys(data);
-    const values = Object.values(data);
+    // Converti stringhe vuote a NULL per i campi data in riparazioni
+    const values = isRiparazioni ? Object.entries(data).map(([key, value]) => {
+      if ((key === 'data_checkout' || key === 'data_checkin') && (value === '' || value === null)) {
+        return null;
+      }
+      return value;
+    }) : Object.values(data);
     const placeholders = columns.map(() => '?').join(',');
     
     const query = `INSERT INTO \`${table}\` (${columns.map(c => `\`${c}\``).join(',')}) VALUES (${placeholders})`;

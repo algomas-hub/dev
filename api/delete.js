@@ -1,4 +1,4 @@
-const { pool, corsHeaders, handleCors, handleError } = require('./utils');
+const { pool, poolRiparazioni, corsHeaders, handleCors, handleError } = require('./utils');
 
 module.exports = async (req, res) => {
   Object.entries(corsHeaders).forEach(([key, val]) => {
@@ -21,7 +21,11 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Table name and id are required' });
     }
 
-    const connection = await pool.getConnection();
+    // Determine which database pool to use
+    const isRiparazioni = ['riparazioni', 'cronostoria'].includes(table);
+    const selectedPool = isRiparazioni ? poolRiparazioni : pool;
+
+    const connection = await selectedPool.getConnection();
     const query = `DELETE FROM \`${table}\` WHERE id = ?`;
     
     const [result] = await connection.query(query, [id]);

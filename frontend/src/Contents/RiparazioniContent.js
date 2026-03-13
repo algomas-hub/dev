@@ -56,7 +56,6 @@ export default function RiparazioniContent() {
   const [columns, setColumns] = useState([]);
   const [statoFilter, setStatoFilter] = useState('');
   const [statoOptions, setStatoOptions] = useState([]);
-  const [viewAll, setViewAll] = useState(false);
   const [orderBy, setOrderBy] = useState('data_checkin');
   const [orderDirection, setOrderDirection] = useState('desc');
   const [statoCount, setStatoCount] = useState({});
@@ -835,7 +834,6 @@ export default function RiparazioniContent() {
                             padding: '4px',
                             borderBottom: '1px solid #333333',
                             backgroundColor: column === 'stato_riparazione' ? getRowBackgroundColor(row.stato_riparazione) : 'inherit',
-                            color: column === 'stato_riparazione' ? getRowTextColor(row.stato_riparazione) : '#fff',
                           }}>
                           {column === 'cliente_avvisato' ? (
                             row[column] === 1 ? (
@@ -975,8 +973,8 @@ export default function RiparazioniContent() {
                         <Grid item xs={12} key="foto" sx={{ mb: 0.2 }}>
                           <TextField
                             label="foto"
-                            value={formData['foto'] ?? ''}
-                            onChange={(e) => setFormData({ ...formData, ['foto']: e.target.value })}
+                            value={formData.foto ?? ''}
+                            onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
                             fullWidth
                             size="small"
                             disabled={!editingId}
@@ -1007,8 +1005,8 @@ export default function RiparazioniContent() {
                         <Grid item xs={12} key="problema_riscontrato" sx={{ mb: 0.2 }}>
                           <TextField
                             label="problema_riscontrato"
-                            value={formData['problema_riscontrato'] ?? ''}
-                            onChange={(e) => setFormData({ ...formData, ['problema_riscontrato']: e.target.value })}
+                            value={formData.problema_riscontrato ?? ''}
+                            onChange={(e) => setFormData({ ...formData, problema_riscontrato: e.target.value })}
                             fullWidth
                             size="small"
                             disabled={!editingId}
