@@ -78,7 +78,7 @@ export default function RiparazioniContent() {
     setHistoryData([]);
     try {
       // Chiamata tramite cognome
-      const response = await fetch(`${API_BASE_URL}/riparazioni/history?cognome=${encodeURIComponent(row.cognome)}`);
+      const response = await fetch(`${API_BASE_URL}/history?cognome=${encodeURIComponent(row.cognome)}`);
       const data = await response.json();
       if (data.success) {
         setHistoryData(data.data);
@@ -198,7 +198,7 @@ export default function RiparazioniContent() {
 
   const fetchStatoOptions = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/riparazioni/distinct?table=${TABLE_NAME}&field=stato_riparazione`);
+      const response = await fetch(`${API_BASE_URL}/distinct?table=${TABLE_NAME}&field=stato_riparazione`);
       const data = await response.json();
       if (data.success) {
         setStatoOptions(data.data);
@@ -212,7 +212,7 @@ export default function RiparazioniContent() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${API_BASE_URL}/riparazioni/select?table=${TABLE_NAME}`);
+      const response = await fetch(`${API_BASE_URL}/select?table=${TABLE_NAME}`);
       const data = await response.json();
       
       if (data.success) {
@@ -269,7 +269,7 @@ export default function RiparazioniContent() {
   const handleSave = async () => {
     try {
       if (editingId) {
-        const response = await fetch(`${API_BASE_URL}/riparazioni/update`, {
+        const response = await fetch(`${API_BASE_URL}/update`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -295,8 +295,15 @@ export default function RiparazioniContent() {
   const handleDelete = async (id) => {
     if (window.confirm('Sei sicuro di voler eliminare questo record?')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/riparazioni/delete?table=${TABLE_NAME}&id=${id}`, {
-          method: 'DELETE'
+        const response = await fetch(`${API_BASE_URL}/delete`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            table: TABLE_NAME,
+            id: id
+          })
         });
         const data = await response.json();
         if (data.success) {
@@ -317,7 +324,7 @@ export default function RiparazioniContent() {
       return;
     }
     try {
-      const response = await fetch(`${API_BASE_URL}/riparazioni/insert`, {
+      const response = await fetch(`${API_BASE_URL}/insert`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
