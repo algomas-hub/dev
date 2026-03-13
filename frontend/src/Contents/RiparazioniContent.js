@@ -56,6 +56,7 @@ export default function RiparazioniContent() {
   const [columns, setColumns] = useState([]);
   const [statoFilter, setStatoFilter] = useState('');
   const [statoOptions, setStatoOptions] = useState([]);
+  const [viewAll, setViewAll] = useState(false);
   const [orderBy, setOrderBy] = useState('data_checkin');
   const [orderDirection, setOrderDirection] = useState('desc');
   const [statoCount, setStatoCount] = useState({});
