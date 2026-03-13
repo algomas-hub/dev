@@ -14,6 +14,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import HomeIcon from '@mui/icons-material/Home';
 import LinkIcon from '@mui/icons-material/Link';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import BuildIcon from '@mui/icons-material/Build';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
@@ -41,6 +42,7 @@ export default function SideMenu({ onLogout, collapsed = false, onToggleCollapse
   const menuItems = [
     { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'Cassa', path: '/cassa', icon: <ShoppingCartIcon /> },
+    { label: 'Riparazioni', path: '/riparazioni', icon: <BuildIcon /> },
     { label: 'Magazzino', path: '/magazzino', icon: <InventoryIcon /> },
     { label: 'Link', path: '/link', icon: <LinkIcon /> },
   ];

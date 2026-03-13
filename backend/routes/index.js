@@ -1,6 +1,28 @@
+
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db');
+const { pool, poolRiparazioni } = require('../config/db');
+
+// GET - Cronostoria riparazioni per cliente (basata su cognome)
+// Uso: GET /api/riparazioni/history?cognome=ROSSI
+router.get('/riparazioni/history', async (req, res) => {
+  try {
+    const { cognome } = req.query;
+    if (!cognome) {
+      return res.status(400).json({ error: 'cognome is required' });
+    }
+    const connection = await poolRiparazioni.getConnection();
+    // Trova tutte le riparazioni con lo stesso cognome, ordinate per data_checkin desc
+    const [storico] = await connection.query(
+      'SELECT id, data_checkin as data, stato_riparazione as stato, problema_riscontrato, modello FROM riparazioni WHERE cognome = ? ORDER BY data_checkin DESC',
+      [cognome]
+    );
+    connection.release();
+    res.json({ success: true, data: storico });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Funzione per estrarre marca, colore e taglia dalla descrizione
 // Formato: [marca] nome [colore] [taglia]
@@ -435,6 +457,195 @@ router.get('/top-products', async (req, res) => {
     });
 
     res.json({ success: true, data: rowsConDati });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== RIPARAZIONI DATABASE ====================
+
+// GET - Recupera dati da una tabella del database riparazioni
+// Uso: GET /api/riparazioni/select?table=nome_tabella&limit=10
+router.get('/riparazioni/select', async (req, res) => {
+  try {
+    const { table, limit = 100, offset = 0, where } = req.query;
+    
+    if (!table) {
+      return res.status(400).json({ error: 'Table name is required' });
+    }
+
+    const connection = await poolRiparazioni.getConnection();
+    let query = `SELECT * FROM \`${table}\` LIMIT ? OFFSET ?`;
+    let params = [parseInt(limit), parseInt(offset)];
+
+    if (where) {
+      query = `SELECT * FROM \`${table}\` WHERE ${where} LIMIT ? OFFSET ?`;
+    }
+
+    const [rows] = await connection.query(query, params);
+    connection.release();
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Recupera un singolo record dal database riparazioni
+// Uso: GET /api/riparazioni/select/:table/:id
+router.get('/riparazioni/select/:table/:id', async (req, res) => {
+  try {
+    const { table, id } = req.params;
+    const connection = await poolRiparazioni.getConnection();
+    
+    const [rows] = await connection.query(
+      `SELECT * FROM \`${table}\` WHERE id = ?`,
+      [id]
+    );
+    connection.release();
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Record not found' });
+    }
+    res.json({ success: true, data: rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Inserisci nuovi dati nel database riparazioni
+// Uso: POST /api/riparazioni/insert con body: { table: "nome_tabella", data: { col1: "val1", col2: "val2" } }
+router.post('/riparazioni/insert', async (req, res) => {
+  try {
+    const { table, data } = req.body;
+
+    if (!table || !data || Object.keys(data).length === 0) {
+      return res.status(400).json({ error: 'Table name and data are required' });
+    }
+
+    const connection = await poolRiparazioni.getConnection();
+    const columns = Object.keys(data);
+    const values = Object.values(data);
+    const placeholders = columns.map(() => '?').join(',');
+    
+    const query = `INSERT INTO \`${table}\` (${columns.map(c => `\`${c}\``).join(',')}) VALUES (${placeholders})`;
+    
+    const [result] = await connection.query(query, values);
+    connection.release();
+    
+    res.json({ 
+      success: true, 
+      message: 'Data inserted successfully',
+      insertId: result.insertId
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT - Aggiorna dati nel database riparazioni
+// Uso: PUT /api/riparazioni/update con body: { table: "nome_tabella", id: 1, data: { col1: "nuovo_valore" } }
+router.put('/riparazioni/update', async (req, res) => {
+  try {
+    const { table, id, data } = req.body;
+
+    if (!table || !id || !data || Object.keys(data).length === 0) {
+      return res.status(400).json({ error: 'Table name, id, and data are required' });
+    }
+
+    const connection = await poolRiparazioni.getConnection();
+    const columns = Object.keys(data);
+    const values = Object.values(data);
+    
+    const setClause = columns.map(c => `\`${c}\` = ?`).join(',');
+    const query = `UPDATE \`${table}\` SET ${setClause} WHERE id = ?`;
+    
+    const [result] = await connection.query(query, [...values, id]);
+    connection.release();
+    
+    res.json({ 
+      success: true, 
+      message: 'Data updated successfully',
+      affectedRows: result.affectedRows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE - Cancella dati dal database riparazioni
+// Uso: DELETE /api/riparazioni/delete?table=nome_tabella&id=1
+router.delete('/riparazioni/delete', async (req, res) => {
+  try {
+    const { table, id } = req.query;
+
+    if (!table || !id) {
+      return res.status(400).json({ error: 'Table name and id are required' });
+    }
+
+    const connection = await poolRiparazioni.getConnection();
+    const [result] = await connection.query(
+      `DELETE FROM \`${table}\` WHERE id = ?`,
+      [id]
+    );
+    connection.release();
+    
+    res.json({ 
+      success: true, 
+      message: 'Data deleted successfully',
+      affectedRows: result.affectedRows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Recupera tabelle del database riparazioni
+router.get('/riparazioni/tables', async (req, res) => {
+  try {
+    const connection = await poolRiparazioni.getConnection();
+    const [tables] = await connection.query(
+      'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?',
+      ['vq3qudhp_riparazioni']
+    );
+    connection.release();
+    res.json({ success: true, data: tables });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Schema di una tabella nel database riparazioni
+// Uso: GET /api/riparazioni/schema/:table
+router.get('/riparazioni/schema/:table', async (req, res) => {
+  try {
+    const { table } = req.params;
+    const connection = await poolRiparazioni.getConnection();
+    const [schema] = await connection.query(`DESCRIBE \`${table}\``);
+    connection.release();
+    res.json({ success: true, data: schema });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Valori unici di uno specifico campo
+// Uso: GET /api/riparazioni/distinct?table=riparazioni&field=stato_riparazione
+router.get('/riparazioni/distinct', async (req, res) => {
+  try {
+    const { table, field } = req.query;
+
+    if (!table || !field) {
+      return res.status(400).json({ error: 'Table and field are required' });
+    }
+
+    const connection = await poolRiparazioni.getConnection();
+    const [results] = await connection.query(
+      `SELECT DISTINCT \`${field}\` FROM \`${table}\` WHERE \`${field}\` IS NOT NULL AND \`${field}\` != '' ORDER BY \`${field}\` ASC`
+    );
+    connection.release();
+
+    const values = results.map(row => row[field]).filter(val => val && String(val).trim() !== '');
+    res.json({ success: true, data: values });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

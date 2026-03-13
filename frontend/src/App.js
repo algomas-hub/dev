@@ -9,6 +9,7 @@ import DashboardContent from './Contents/DashboardContent';
 import LinkContent from './Contents/LinkContent';
 import MagazzinoContent from './Contents/MagazzinoContent';
 import CassaContent from './Contents/CassaContent';
+import RiparazioniContent from './Contents/RiparazioniContent';
 import LoginPage from './pages/LoginPage';
 
 // Tema moderno minimalista with dark palette
@@ -249,6 +250,7 @@ function App() {
             <Routes>
               <Route path="/" exact element={<DashboardContent />} />
               <Route path="/cassa" exact element={<CassaContent />} />
+              <Route path="/riparazioni" exact element={<RiparazioniContent />} />
               <Route path="/link" exact element={<LinkContent />} />
               <Route path="/magazzino" exact element={<MagazzinoContent />} />
               <Route path="/dashboard" exact element={<DashboardContent />} />
