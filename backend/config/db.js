@@ -15,7 +15,7 @@ const poolRiparazioni = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: 'vq3qudhp_riparazioni',
+  database: process.env.DB_NAME_RIPARAZIONI,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
