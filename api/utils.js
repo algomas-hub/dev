@@ -23,6 +23,19 @@ const pool = mysql.createPool({
   keepAliveInitialDelayMs: 0
 });
 
+// Database pool for riparazioni
+const poolRiparazioni = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME_RIPARAZIONI || 'vq3qudhp_riparazioni',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelayMs: 0
+});
+
 // CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,6 +69,7 @@ const handleError = (res, error) => {
 
 module.exports = {
   pool,
+  poolRiparazioni,
   corsHeaders,
   handleCors,
   handleError
