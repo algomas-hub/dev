@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Alert,
   Button,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -26,6 +27,7 @@ import {
   Chip,
 } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
+import PrintRoundedIcon from '@mui/icons-material/PrintRounded';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -685,7 +687,7 @@ export default function RiparazioniContent() {
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center', flex: 1 }}>
           {/* Card TUTTI TRANNE CONSEGNATI */}
           <Card
-            onClick={() => setStatoFilter('')}
+            onClick={(e) => { e.stopPropagation(); setSelectedRow(null); setFormData({}); setStatoFilter(''); }}
             sx={{
               p: 0.3,
               cursor: 'pointer',
@@ -700,7 +702,8 @@ export default function RiparazioniContent() {
               justifyContent: 'center',
               textAlign: 'center',
               transition: 'all 0.2s ease',
-              borderRadius: '10px',
+              borderRadius: '4px',
+                                borderRadius: '4px',
               boxShadow: 'none',
               border: '3px solid #FF9800',
               '&:hover': {
@@ -734,7 +737,7 @@ export default function RiparazioniContent() {
             return (
               <Card
                 key={stato}
-                onClick={() => setStatoFilter(stato)}
+                onClick={(e) => { e.stopPropagation(); setSelectedRow(null); setFormData({}); setStatoFilter(stato); }}
                 sx={{
                   p: 0.3,
                   cursor: 'pointer',
@@ -749,7 +752,7 @@ export default function RiparazioniContent() {
                   justifyContent: 'center',
                   textAlign: 'center',
                   transition: 'all 0.2s ease',
-                  borderRadius: '10px',
+                  borderRadius: '4px',
                   boxShadow: 'none',
                   border: `3px solid ${baseBg}`,
                   '&:hover': {
@@ -780,7 +783,7 @@ export default function RiparazioniContent() {
       )}
 
       {!loading && riparazioni.length > 0 && (
-        <Grid container spacing={2} sx={{ flex: 1, minHeight: 0, height: '100%' }}>
+        <Grid container spacing={2} sx={{ flex: 1, minHeight: 0, height: '100%' }} onClick={() => { setSelectedRow(null); setFormData({}); }}>
           <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 2 }}>
               <Button 
@@ -799,7 +802,20 @@ export default function RiparazioniContent() {
                 size="small"
                 onClick={handlePrint}
               >
-                Stampa
+                <IconButton
+                  size="small"
+                  onClick={handlePrint}
+                  sx={{
+                    color: '#FF9800',
+                    height: 24,
+                    minHeight: 24,
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    }
+                  }}
+                >
+                  <PrintRoundedIcon sx={{ fontSize: '1.5rem' }} />
+                </IconButton>
               </Button>
             </Box>
             <TableContainer component={Card} sx={{ flex: 1, minHeight: 0, maxHeight: 'calc(100vh - 280px)', overflowY: 'auto', overflowX: 'auto', width: '100%' }}>
@@ -857,7 +873,7 @@ export default function RiparazioniContent() {
                       key={row.id}
                       id={`row-riparazione-${row.id}`}
                       hover
-                      onClick={() => handleSelectRow(row)}
+                      onClick={(e) => { e.stopPropagation(); handleSelectRow(row); }}
                       sx={{
                         cursor: 'pointer',
                         backgroundColor: selectedRow?.id === row.id ? '#252525' : (rowIndex % 2 === 0 ? '#1E1E1E' : '#252525'),
@@ -898,6 +914,7 @@ export default function RiparazioniContent() {
                                 fontWeight: 600,
                                 height: 22,
                                 width: 'fit-content',
+                                borderRadius: '4px', // Same round as filter cards
                               }}
                             />
                           ) : column === 'cliente_avvisato' ? (
@@ -1023,7 +1040,7 @@ export default function RiparazioniContent() {
             </TableContainer>
           </Grid>
 
-          <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }} onClick={(e) => e.stopPropagation()}>
             {selectedRow ? (
               <Card sx={{ bgcolor: 'background.paper', flex: '0 1 800px', maxHeight: 800, minHeight: 0, boxShadow: 2, borderRadius: 2, overflow: 'hidden' }}>
                 <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', p: 1.2, overflow: 'hidden' }}>
@@ -1407,19 +1424,19 @@ export default function RiparazioniContent() {
       </Dialog>
 
       {/* Dialog Stampa */}
-      <Dialog open={openPrint} onClose={() => setOpenPrint(false)} maxWidth="lg" fullWidth>
-        <Box sx={{ bgcolor: 'white', p: 1.5 }} id="print-content">
+      <Dialog open={openPrint} onClose={() => setOpenPrint(false)} maxWidth="lg" fullWidth PaperProps={{ sx: { bgcolor: '#ffffff' } }}>
+        <Box sx={{ bgcolor: '#ffffff', p: 1.5 }} id="print-content">
           {printData && (
-            <Box sx={{ fontFamily: 'Arial, sans-serif', color: '#000' }}>
+            <Box sx={{ fontFamily: 'Arial, sans-serif', color: '#000', bgcolor: '#ffffff' }}>
               {/* Intestazione */}
               <div style={{ borderBottom: '1px solid #000', paddingBottom: 4, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                <span style={{ fontWeight: 700, fontSize: '14px', letterSpacing: 1 }}>SCHEDA RIPARAZIONE</span>
-                <span style={{ fontSize: '10px' }}>Data: {new Date().toLocaleDateString('it-IT')}</span>
+                <span style={{ fontWeight: 700, fontSize: '14px', letterSpacing: 1, color: '#000' }}>SCHEDA RIPARAZIONE</span>
+                <span style={{ fontSize: '10px', color: '#000' }}>Data: {new Date().toLocaleDateString('it-IT')}</span>
               </div>
 
               {/* Sezione Cliente */}
               <div style={{ marginBottom: 6 }}>
-                <div style={{ fontWeight: 700, fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #ccc', paddingBottom: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: '9px', color: '#000', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #000', paddingBottom: 1 }}>
                   Informazioni Cliente
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -1428,7 +1445,7 @@ export default function RiparazioniContent() {
                       {['cognome', 'data_checkin', 'data_checkout', 'cliente_avvisato'].map(key => (
                         printData[key] !== undefined ? (
                           <td key={key} style={{ width: '25%', padding: '2px 4px', verticalAlign: 'top' }}>
-                            <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>{key.replace(/_/g, ' ')}</div>
+                            <div style={{ fontSize: '8px', fontWeight: 700, color: '#000', textTransform: 'uppercase' }}>{key.replace(/_/g, ' ')}</div>
                             <div style={{ fontSize: '10px', fontWeight: 500, marginTop: 1 }}>
                               {printData[key] === 1 ? 'Sì' : printData[key] === 0 ? 'No' : (printData[key] || '—')}
                             </div>
@@ -1442,7 +1459,7 @@ export default function RiparazioniContent() {
 
               {/* Sezione Stato */}
               <div style={{ marginBottom: 6 }}>
-                <div style={{ fontWeight: 700, fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #ccc', paddingBottom: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: '9px', color: '#000', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #000', paddingBottom: 1 }}>
                   Stato
                 </div>
                 <div style={{ padding: '2px 4px', fontSize: '10px', fontWeight: 600 }}>
@@ -1452,7 +1469,7 @@ export default function RiparazioniContent() {
 
               {/* Sezione Dettagli Tecnici */}
               <div style={{ marginBottom: 6 }}>
-                <div style={{ fontWeight: 700, fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #ccc', paddingBottom: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: '9px', color: '#000', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #000', paddingBottom: 1 }}>
                   Dettagli Tecnici
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -1467,10 +1484,10 @@ export default function RiparazioniContent() {
                         rows.push(fields.slice(i, i + 5));
                       }
                       return rows.map((row, ri) => (
-                        <tr key={ri} style={{ borderBottom: '1px solid #eee' }}>
+                        <tr key={ri} style={{ borderBottom: '1px solid #000' }}>
                           {row.map(key => (
                             <td key={key} style={{ width: '20%', padding: '2px 4px', verticalAlign: 'top' }}>
-                              <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>
+                              <div style={{ fontSize: '8px', fontWeight: 700, color: '#000', textTransform: 'uppercase' }}>
                                 {key.replace(/_/g, ' ')}
                               </div>
                               <div style={{ fontSize: '10px', marginTop: 1 }}>

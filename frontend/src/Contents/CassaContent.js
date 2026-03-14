@@ -593,25 +593,18 @@ function CassaContent() {
                                           }}>
                                             {renderHeaderWithCheckbox('prezzo_scontato', 'PREZZO', sortCriteria, setSortCriteria, handleSort)}
                                           </TableCell>
-                                          <TableCell sx={{ 
-                                            fontWeight: '600', 
-                                            fontSize: '0.7rem', 
-                                            color: '#E0E0E0',
-                                            padding: '4px 6px',
-                                            letterSpacing: '0px',
-                                            width: '50px',
-                                            textAlign: 'center'
-                                          }}>AZIONE</TableCell>
                                         </TableRow>
                                       </TableHead>
                                       <TableBody>
                                         {articoliOrdinati.map((articolo, index) => (
                                           <TableRow 
                                             key={articolo.codice}
+                                            onDoubleClick={() => handleAggiungi(articolo)}
                                             sx={{ 
                                               backgroundColor: index % 2 === 0 ? '#1E1E1E' : '#252525',
                                               '&:hover': {
                                                 backgroundColor: '#2A2A2A',
+                                                cursor: 'pointer',
                                               },
                                               borderBottom: '1px solid #333333',
                                               height: 'auto',
@@ -831,11 +824,6 @@ function CassaContent() {
                                                   {articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato).toFixed(2) : 'N/A'} €
                                                 </span>
                                               )}
-                                            </TableCell>
-                                            <TableCell sx={{ fontSize: '0.65rem', color: '#FFFFFF', padding: '8px', fontWeight: '500', width: '50px', minWidth: '50px', maxWidth: '50px', textAlign: 'center' }}>
-                                              <IconButton size="small" onClick={() => handleAggiungi(articolo)} sx={{ color: '#FF9800', '&:hover': { backgroundColor: 'rgba(255, 152, 0, 0.1)' }, padding: '2px' }}>
-                                                <AddShoppingCartRoundedIcon fontSize="small" />
-                                              </IconButton>
                                             </TableCell>
                                           </TableRow>
                                         ))}
@@ -1298,7 +1286,7 @@ function CassaContent() {
       </Dialog>
       
       {/* Dialog Stampa Carrello */}
-      <Dialog open={openPrintDialog} onClose={() => setOpenPrintDialog(false)} maxWidth="md" fullWidth>
+      <Dialog open={openPrintDialog} onClose={() => setOpenPrintDialog(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: '#ffffff' } }}>
         <Box sx={{ bgcolor: 'white', p: 2 }} id="print-content">
           <Box sx={{ fontFamily: 'Arial, sans-serif', color: '#000' }}>
             {/* Intestazione */}
@@ -1318,23 +1306,29 @@ function CassaContent() {
                   value={printNome}
                   onChange={(e) => setPrintNome(e.target.value)}
                   size="small"
-                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' } } }}
-                />
+                  variant="outlined"
+                  InputProps={{ style: { backgroundColor: '#f5f5f5' } }}
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#000000', bgcolor: '#f5f5f5' }, '& .MuiInputLabel-root': { color: '#000000' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#e0e0e0' }, '&:hover fieldset': { borderColor: '#bdbdbd' } } }}
+/>
                 <TextField
                   label="Cognome"
                   value={printCognome}
                   onChange={(e) => setPrintCognome(e.target.value)}
                   size="small"
-                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' } } }}
-                />
+                  variant="outlined"
+                  InputProps={{ style: { backgroundColor: '#f5f5f5' } }}
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#000000', bgcolor: '#f5f5f5' }, '& .MuiInputLabel-root': { color: '#000000' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#e0e0e0' }, '&:hover fieldset': { borderColor: '#bdbdbd' } } }}
+/>
                 <TextField
                   label="Valido dal"
                   type="date"
                   value={printValidoDal}
                   onChange={(e) => setPrintValidoDal(e.target.value)}
                   size="small"
+                  variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' }, '& input[type="date"]::-webkit-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-moz-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-ms-input': { filter: 'invert(1)' } } }}
+                  InputProps={{ style: { backgroundColor: '#f5f5f5' } }}
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#000000', bgcolor: '#f5f5f5' }, '& .MuiInputLabel-root': { color: '#000000' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#e0e0e0' }, '&:hover fieldset': { borderColor: '#bdbdbd' }, '& input[type="date"]::-webkit-calendar-picker-indicator': { filter: 'none', color: '#000000' }, '& input[type="date"]::-moz-calendar-picker-indicator': { filter: 'none' }, '& input[type="date"]::-ms-input': { filter: 'none' } } }}
 />
                 <TextField
                   label="Valido al"
@@ -1342,8 +1336,10 @@ function CassaContent() {
                   value={printValidoAl}
                   onChange={(e) => setPrintValidoAl(e.target.value)}
                   size="small"
+                  variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' }, '& input[type="date"]::-webkit-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-moz-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-ms-input': { filter: 'invert(1)' } } }}
+                  InputProps={{ style: { backgroundColor: '#f5f5f5' } }}
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#000000', bgcolor: '#f5f5f5' }, '& .MuiInputLabel-root': { color: '#000000' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#e0e0e0' }, '&:hover fieldset': { borderColor: '#bdbdbd' }, '& input[type="date"]::-webkit-calendar-picker-indicator': { filter: 'none', color: '#000000' }, '& input[type="date"]::-moz-calendar-picker-indicator': { filter: 'none' }, '& input[type="date"]::-ms-input': { filter: 'none' } } }}
 />
               </Box>
               {/* Versione stampabile dei campi */}
