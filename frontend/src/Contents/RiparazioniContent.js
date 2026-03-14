@@ -23,6 +23,7 @@ import {
   Dialog,
   Paper,
   MenuItem,
+  Chip,
 } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import AddIcon from '@mui/icons-material/Add';
@@ -72,6 +73,8 @@ export default function RiparazioniContent() {
   });
   const [confirmSaveDialog, setConfirmSaveDialog] = useState(false);
   const [validationErrorDialog, setValidationErrorDialog] = useState(false);
+  const [openPrint, setOpenPrint] = useState(false);
+  const [printData, setPrintData] = useState(null);
   // Funzione per aprire il dialog e caricare la cronostoria
   const handleOpenHistory = async (row) => {
     setOpenHistory(true);
@@ -320,6 +323,14 @@ export default function RiparazioniContent() {
     }
   };
 
+  const handlePrint = () => {
+    console.log('handlePrint called', selectedRow);
+    if (selectedRow) {
+      setPrintData(selectedRow);
+      setOpenPrint(true);
+    }
+  };
+
   const handleSaveNewRepair = async () => {
     if (!newRepairData.cognome.trim()) {
       setValidationErrorDialog(true);
@@ -360,13 +371,13 @@ export default function RiparazioniContent() {
     const sostituiteIdx = otherFields.indexOf('sostituite');
     let fieldsOrder = [...otherFields];
     if (sostituiteIdx !== -1) {
-      let insertIdx = sostituiteIdx + 1;
-      if (columns.includes('camo')) fieldsOrder.splice(insertIdx++, 0, 'camo');
+      let insertIdx = sostituiteIdx;
       if (columns.includes('accessori')) fieldsOrder.splice(insertIdx++, 0, 'accessori');
       if (columns.includes('garanzia')) fieldsOrder.splice(insertIdx++, 0, 'garanzia');
+      if (columns.includes('data_checkout')) fieldsOrder.splice(3, 0, 'data_checkout');
       let garCli = [];
       if (columns.includes('cliente_avvisato')) garCli.push('cliente_avvisato');
-      if (columns.includes('data_checkout')) garCli.push('data_checkout');
+      if (columns.includes('camo')) garCli.push('camo');
       if (garCli.length > 0) fieldsOrder.splice(insertIdx++, 0, garCli);
       if (columns.includes('hpa')) fieldsOrder.splice(insertIdx++, 0, 'hpa');
       if (columns.includes('wraithhpa')) fieldsOrder.splice(insertIdx++, 0, 'wraithhpa');
@@ -451,6 +462,11 @@ export default function RiparazioniContent() {
             <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
               <FormControlLabel control={<Checkbox checked={!!formData['cliente_avvisato']} onChange={e => editingId && setFormData({ ...formData, cliente_avvisato: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>cliente avvisato</span>} sx={{ ml: 0.5, mb: 0.2 }} />
             </Grid>
+            {column.includes('camo') && (
+              <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
+                <FormControlLabel control={<Checkbox checked={!!formData['camo']} onChange={e => editingId && setFormData({ ...formData, camo: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>camo</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+              </Grid>
+            )}
             {column.includes('data_checkout') && (
               <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
                 {(() => {
@@ -468,8 +484,8 @@ export default function RiparazioniContent() {
 
       if (column === 'sostituite') {
         return (
-          <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key="sostituite" sx={{ mb: 0.2 }}>
-            <TextField label="sostituite" value={formData.sostituite ?? ''} onChange={(e) => setFormData({ ...formData, sostituite: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+          <Grid item xs={12} key="sostituite" sx={{ mb: 0.2 }}>
+            <TextField label="sostituite" value={formData.sostituite ?? ''} onChange={(e) => setFormData({ ...formData, sostituite: e.target.value })} fullWidth size="small" disabled={!editingId} multiline rows={4} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -556,7 +572,7 @@ export default function RiparazioniContent() {
       if (column === 'statohpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               <MenuItem value="VENDUTO">VENDUTO</MenuItem>
               <MenuItem value="CASA">CASA</MenuItem>
@@ -568,7 +584,7 @@ export default function RiparazioniContent() {
       if (column === 'enginehpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               <MenuItem value="INFERNO">INFERNO</MenuItem>
               <MenuItem value="AAP01">AAP01</MenuItem>
@@ -625,12 +641,12 @@ export default function RiparazioniContent() {
   };
 
   return (
-    <Paper elevation={8} sx={{
-      p: 2.5,
-      backgroundColor: 'rgba(255,255,255,0.1)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255,255,255,0.2)',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+    <Paper elevation={2} sx={{
+      p: 1,
+      backgroundColor: 'transparent',
+      backdropFilter: 'blur(5px)',
+      border: 'none',
+      boxShadow: 'none',
       borderRadius: 3,
       m: { xs: 0.5, md: 2 },
       flex: 1,
@@ -639,6 +655,7 @@ export default function RiparazioniContent() {
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
+      color: 'white',
     }}>
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
@@ -649,19 +666,19 @@ export default function RiparazioniContent() {
       )}
 
       {/* Card filtro stato e Nuova Riparazione in linea */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+      <Paper elevation={2} sx={{ p: 2, mb: 2, bgcolor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(5px)', borderRadius: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center', flex: 1 }}>
           {/* Card TUTTI TRANNE CONSEGNATI */}
           <Card
             onClick={() => setStatoFilter('')}
             sx={{
               p: 0.3,
               cursor: 'pointer',
-              bgcolor: statoFilter === '' ? '#FF9800' : 'background.paper',
+              bgcolor: 'transparent',
               color: 'white',
-              minWidth: 70,
-              maxWidth: 130,
-              width: 130,
+              flex: 1,
+              minWidth: 80,
               height: 48,
               display: 'flex',
               flexDirection: 'column',
@@ -671,14 +688,14 @@ export default function RiparazioniContent() {
               transition: 'all 0.2s ease',
               borderRadius: '10px',
               boxShadow: 'none',
-              border: '1.5px solid #222',
+              border: '3px solid #FF9800',
               '&:hover': {
                 boxShadow: 'none',
                 transform: 'translateY(-2px)',
               },
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>TUTTI (NO CONS.)</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', color: 'white' }}>TUTTI (NO CONS.)</Typography>
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '0.78rem', mt: 0.2 }}>
               {riparazioni.length - (statoCount['CONSEGNATO'] || 0) - (statoCount['RESO AL CLIENTE'] || 0)}
             </Typography>
@@ -707,11 +724,10 @@ export default function RiparazioniContent() {
                 sx={{
                   p: 0.3,
                   cursor: 'pointer',
-                  bgcolor: darkBg,
+                  bgcolor: 'transparent',
                   color: 'white',
-                  minWidth: 70,
-                  maxWidth: 90,
-                  width: 90,
+                  flex: 1,
+                  minWidth: 80,
                   height: 48,
                   display: 'flex',
                   flexDirection: 'column',
@@ -721,14 +737,14 @@ export default function RiparazioniContent() {
                   transition: 'all 0.2s ease',
                   borderRadius: '10px',
                   boxShadow: 'none',
-                  border: '1.5px solid #222',
+                  border: `3px solid ${baseBg}`,
                   '&:hover': {
                     boxShadow: 'none',
                     transform: 'translateY(-2px)',
                   },
                 }}
               >
-                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{stato}</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.62rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', color: 'white' }}>{stato}</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '0.78rem', mt: 0.2 }}>
                   {statoCount[stato] || 0}
                 </Typography>
@@ -738,6 +754,7 @@ export default function RiparazioniContent() {
         </Box>
         {/* Il pulsante Nuova Riparazione ora si trova accanto a 'Elenco Riparazioni' */}
       </Box>
+      </Paper>
       {!loading && riparazioni.length === 0 && (
         <Card sx={{ bgcolor: 'background.paper' }}>
           <CardContent>
@@ -752,11 +769,23 @@ export default function RiparazioniContent() {
         <Grid container spacing={2} sx={{ flex: 1, minHeight: 0, height: '100%' }}>
           <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary', mb: 0 }}>
-                Elenco Riparazioni
-              </Typography>
-              <Button variant="contained" startIcon={<AddIcon />} disabled={loading} onClick={() => setOpenNewRepair(true)}>
+              <Button 
+                variant="contained" 
+                size="small"
+                startIcon={<AddIcon />} 
+                disabled={loading} 
+                onClick={() => setOpenNewRepair(true)}
+                sx={{ color: '#000', fontWeight: 700 }}
+              >
                 Nuova Riparazione
+              </Button>
+              <Button 
+                variant="outlined" 
+                color="primary" 
+                size="small"
+                onClick={handlePrint}
+              >
+                Stampa
               </Button>
             </Box>
             <TableContainer component={Card} sx={{ flex: 1, minHeight: 0, maxHeight: 'calc(100vh - 280px)', overflowY: 'auto', overflowX: 'auto', width: '100%' }}>
@@ -834,18 +863,30 @@ export default function RiparazioniContent() {
                         <TableCell 
                           key={column} 
                           sx={{ 
-                            bgcolor: column === 'stato_riparazione' ? getRowBackgroundColor(row.stato_riparazione) : 'inherit',
-                            color: column === 'stato_riparazione' ? getRowTextColor(row.stato_riparazione) : '#fff',
+                            color: '#fff',
                             fontSize: '0.75rem', 
-                            fontWeight: column === 'stato_riparazione' ? 600 : 400,
+                            fontWeight: 400,
                             minHeight: 16,
                             height: 16,
                             padding: '4px',
                             borderBottom: '1px solid #333333',
-                            backgroundColor: column === 'stato_riparazione' ? getRowBackgroundColor(row.stato_riparazione) : 'inherit',
-                            textAlign: column === 'cliente_avvisato' ? 'center' : 'left',
+                            backgroundColor: 'inherit',
+                            textAlign: column === 'cliente_avvisato' || column === 'stato_riparazione' ? 'center' : 'left',
                           }}>
-                          {column === 'cliente_avvisato' ? (
+                          {column === 'stato_riparazione' ? (
+                            <Chip
+                              label={row[column]}
+                              size="small"
+                              sx={{
+                                backgroundColor: getRowBackgroundColor(row[column]),
+                                color: getRowTextColor(row[column]),
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                height: 22,
+                                width: 'fit-content',
+                              }}
+                            />
+                          ) : column === 'cliente_avvisato' ? (
                             row[column] === 1 ? (
                               <ThumbUpIcon sx={{ color: '#4CAF50', fontSize: '1.2rem' }} />
                             ) : row[column] === 0 ? (
@@ -969,9 +1010,6 @@ export default function RiparazioniContent() {
           </Grid>
 
           <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-              Dettagli Riparazione
-            </Typography>
             {selectedRow ? (
               <Card sx={{ bgcolor: 'background.paper', flex: '0 1 800px', maxHeight: 800, minHeight: 0, boxShadow: 2, borderRadius: 2, overflow: 'hidden' }}>
                 <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', p: 1.2, overflow: 'hidden' }}>
@@ -1046,7 +1084,7 @@ export default function RiparazioniContent() {
                       )}
                     </Grid>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 0.7, pt: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 0.7, pt: 1, '@media print': { display: 'none' } }}>
                     {!editingId ? (
                       <>
                         <Button
@@ -1353,6 +1391,113 @@ export default function RiparazioniContent() {
           </Box>
         </Box>
       </Dialog>
+
+      {/* Dialog Stampa */}
+      <Dialog open={openPrint} onClose={() => setOpenPrint(false)} maxWidth="lg" fullWidth>
+        <Box sx={{ bgcolor: 'white', p: 1.5 }} id="print-content">
+          {printData && (
+            <Box sx={{ fontFamily: 'Arial, sans-serif', color: '#000' }}>
+              {/* Intestazione */}
+              <div style={{ borderBottom: '1px solid #000', paddingBottom: 4, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <span style={{ fontWeight: 700, fontSize: '14px', letterSpacing: 1 }}>SCHEDA RIPARAZIONE</span>
+                <span style={{ fontSize: '10px' }}>Data: {new Date().toLocaleDateString('it-IT')}</span>
+              </div>
+
+              {/* Sezione Cliente */}
+              <div style={{ marginBottom: 6 }}>
+                <div style={{ fontWeight: 700, fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #ccc', paddingBottom: 1 }}>
+                  Informazioni Cliente
+                </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <tbody>
+                    <tr>
+                      {['cognome', 'data_checkin', 'data_checkout', 'cliente_avvisato'].map(key => (
+                        printData[key] !== undefined ? (
+                          <td key={key} style={{ width: '25%', padding: '2px 4px', verticalAlign: 'top' }}>
+                            <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>{key.replace(/_/g, ' ')}</div>
+                            <div style={{ fontSize: '10px', fontWeight: 500, marginTop: 1 }}>
+                              {printData[key] === 1 ? 'Sì' : printData[key] === 0 ? 'No' : (printData[key] || '—')}
+                            </div>
+                          </td>
+                        ) : <td key={key} style={{ width: '25%' }} />
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Sezione Stato */}
+              <div style={{ marginBottom: 6 }}>
+                <div style={{ fontWeight: 700, fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #ccc', paddingBottom: 1 }}>
+                  Stato
+                </div>
+                <div style={{ padding: '2px 4px', fontSize: '10px', fontWeight: 600 }}>
+                  {printData.stato_riparazione || '—'}
+                </div>
+              </div>
+
+              {/* Sezione Dettagli Tecnici */}
+              <div style={{ marginBottom: 6 }}>
+                <div style={{ fontWeight: 700, fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3, borderBottom: '1px solid #ccc', paddingBottom: 1 }}>
+                  Dettagli Tecnici
+                </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {(() => {
+                      const fields = columns.filter(col => 
+                        !['id', 'history_action', 'foto', 'cognome', 'data_checkin', 'data_checkout', 'cliente_avvisato', 'stato_riparazione'].includes(col) 
+                        && printData[col] !== undefined
+                      );
+                      const rows = [];
+                      for (let i = 0; i < fields.length; i += 5) {
+                        rows.push(fields.slice(i, i + 5));
+                      }
+                      return rows.map((row, ri) => (
+                        <tr key={ri} style={{ borderBottom: '1px solid #eee' }}>
+                          {row.map(key => (
+                            <td key={key} style={{ width: '20%', padding: '2px 4px', verticalAlign: 'top' }}>
+                              <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>
+                                {key.replace(/_/g, ' ')}
+                              </div>
+                              <div style={{ fontSize: '10px', marginTop: 1 }}>
+                                {printData[key] === 1 ? '✓' : printData[key] === 0 ? '' : (printData[key] || '—')}
+                              </div>
+                            </td>
+                          ))}
+                          {row.length < 5 && Array.from({ length: 5 - row.length }).map((_, j) => (
+                            <td key={`empty-${j}`} style={{ width: '20%' }} />
+                          ))}
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottoni (nascosti in stampa) */}
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 1, '@media print': { display: 'none' } }}>
+                <Button 
+                  variant="outlined" 
+                  onClick={() => setOpenPrint(false)}
+                  size="small"
+                  sx={{ color: '#000', borderColor: '#000' }}
+                >
+                  Chiudi
+                </Button>
+                <Button 
+                  variant="contained" 
+                  onClick={() => window.print()}
+                  size="small"
+                  sx={{ bgcolor: '#FF9800', color: '#000', fontWeight: 700 }}
+                >
+                  Stampa
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </Dialog>
+
     </Paper>
   );
 }
