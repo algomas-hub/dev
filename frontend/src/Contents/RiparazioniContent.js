@@ -1125,9 +1125,8 @@ export default function RiparazioniContent() {
                                   try {
                                     const handle = await window.showDirectoryPicker();
                                     setDirectoryHandle(handle);
-                                    const fullPath = `/Volumes/Dati/${handle.name}`;
-                                    setDirectoryPath(fullPath);
-                                    setFormData({ ...formData, foto: fullPath });
+                                    setDirectoryPath(handle.name);
+                                    setFormData({ ...formData, foto: handle.name });
                                   } catch (err) {
                                     // Selezione annullata
                                   }
@@ -1138,6 +1137,19 @@ export default function RiparazioniContent() {
                                 Cartella
                               </Button>
                             )}
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => {
+                                if (formData.foto) {
+                                  window.open(`file://${formData.foto}`, '_blank');
+                                }
+                              }}
+                              disabled={!formData.foto}
+                              sx={{ mt: 1, whiteSpace: 'nowrap' }}
+                            >
+                              Apri
+                            </Button>
                           </Box>
                         </Grid>
                       )}
