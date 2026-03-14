@@ -174,3 +174,8 @@ input[type=number],
     font-family: Arial, sans-serif;
   }
 }
+
+/* Ingrandisce leggermente le label quando hanno un valore (stato shrink) */
+.MuiInputLabel-shrink {
+  font-size: 0.95rem !important;
+}

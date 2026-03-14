@@ -140,14 +140,28 @@ export default function RiparazioniContent() {
 
   const getColumnLabel = (column) => {
     const labels = {
-      'data_checkin': 'CHECKIN',
-      'data_checkout': 'CHECKOUT',
-      'cognome': 'COGNOME',
-      'stato_riparazione': 'STATO',
-      'cliente_avvisato': 'AVVISATO',
+      'data_checkin': 'DATA ARRIVO',
+      'data_checkout': 'DATA RITIRO',
+      'cognome': 'NOME CLIENTE',
+      'stato_riparazione': 'STATO RIPARAZIONE',
+      'cliente_avvisato': 'CLIENTE AVVISATO',
       'hpa': 'HPA',
+      'wraithhpa': 'WRAITH HPA',
+      'camo': 'CAMO',
+      'sostituite': 'PARTI SOSTITUITE',
+      'accessori': 'ACCESSORI',
+      'foto': 'FOTO',
+      'problema_riscontrato': 'PROBLEMA RISCONTRATO',
+      'garanzia': 'GARANZIA',
+      'camp': 'CAMP',
+      'generico': 'GENERICO',
+      'acconto': 'ACCONTO',
+      'statohpa': 'STATO HPA',
+      'enginehpa': 'ENGINE HPA',
+      'configurazionehpa': 'CONFIGURAZIONE HPA',
+      'aperturahpa': 'APERTURA HPA',
     };
-    return labels[column] || column.toUpperCase();
+    return labels[column] || column.replace(/_/g, ' ').toUpperCase();
   };
 
   const getRowBackgroundColor = (stato) => {
@@ -401,14 +415,14 @@ export default function RiparazioniContent() {
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
             <TextField
               select
-              label={column}
+              label={getColumnLabel(column)}
               value={formData[column] ?? ''}
               onChange={e => setFormData({ ...formData, [column]: e.target.value })}
               fullWidth
               size="small"
               disabled={!editingId}
               inputProps={{ style: { fontSize: '0.7rem' } }}
-              InputLabelProps={{ style: { color: 'grey' } }}
+              InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }}
               sx={{
                 mb: 0.2,
                 '& .MuiOutlinedInput-input.Mui-disabled': {
@@ -429,14 +443,14 @@ export default function RiparazioniContent() {
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
             <TextField
               select
-              label={column}
+              label={getColumnLabel(column)}
               value={formData[column] ?? ''}
               onChange={e => setFormData({ ...formData, [column]: e.target.value })}
               fullWidth
               size="small"
               disabled={!editingId}
               inputProps={{ style: { fontSize: '0.7rem' } }}
-              InputLabelProps={{ style: { color: 'grey' } }}
+              InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }}
               sx={{
                 mb: 0.2,
                 '& .MuiOutlinedInput-input.Mui-disabled': {
@@ -457,14 +471,14 @@ export default function RiparazioniContent() {
         return (
           <Grid container spacing={0.7} key="garCli">
             <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
-              <FormControlLabel control={<Checkbox checked={!!formData['garanzia']} onChange={e => editingId && setFormData({ ...formData, garanzia: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>garanzia</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+              <FormControlLabel control={<Checkbox checked={!!formData['garanzia']} onChange={e => editingId && setFormData({ ...formData, garanzia: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>Garanzia</span>} sx={{ ml: 0.5, mb: 0.2 }} />
             </Grid>
             <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
-              <FormControlLabel control={<Checkbox checked={!!formData['cliente_avvisato']} onChange={e => editingId && setFormData({ ...formData, cliente_avvisato: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>cliente avvisato</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+              <FormControlLabel control={<Checkbox checked={!!formData['cliente_avvisato']} onChange={e => editingId && setFormData({ ...formData, cliente_avvisato: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>Cliente Avvisato</span>} sx={{ ml: 0.5, mb: 0.2 }} />
             </Grid>
             {column.includes('camo') && (
               <Grid item xs={12} sm={6} md={3} lg={3} xl={3} sx={{ mb: 0.2 }}>
-                <FormControlLabel control={<Checkbox checked={!!formData['camo']} onChange={e => editingId && setFormData({ ...formData, camo: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>camo</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+                <FormControlLabel control={<Checkbox checked={!!formData['camo']} onChange={e => editingId && setFormData({ ...formData, camo: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>Camo</span>} sx={{ ml: 0.5, mb: 0.2 }} />
               </Grid>
             )}
             {column.includes('data_checkout') && (
@@ -473,7 +487,7 @@ export default function RiparazioniContent() {
                   const dateValue = formData['data_checkout'] ?? '';
                   const formattedValue = dateValue ? (dateValue.includes('-') ? dateValue : dateValue.split('/').reverse().join('-')) : '';
                   return (
-                    <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+                    <TextField type="date" label="Data Ritiro" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ shrink: true, style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
                   );
                 })()}
               </Grid>
@@ -485,7 +499,7 @@ export default function RiparazioniContent() {
       if (column === 'sostituite') {
         return (
           <Grid item xs={12} key="sostituite" sx={{ mb: 0.2 }}>
-            <TextField label="sostituite" value={formData.sostituite ?? ''} onChange={(e) => setFormData({ ...formData, sostituite: e.target.value })} fullWidth size="small" disabled={!editingId} multiline rows={4} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+            <TextField label="Parti Sostituite" value={formData.sostituite ?? ''} onChange={(e) => setFormData({ ...formData, sostituite: e.target.value })} fullWidth size="small" disabled={!editingId} multiline rows={4} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -493,7 +507,7 @@ export default function RiparazioniContent() {
       if (column === 'accessori') {
         return (
           <Grid item xs={12} key="accessori" sx={{ mb: 2 }}>
-            <TextField label="accessori" value={formData.accessori ?? ''} onChange={(e) => setFormData({ ...formData, accessori: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+            <TextField label="Accessori" value={formData.accessori ?? ''} onChange={(e) => setFormData({ ...formData, accessori: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.9rem' } }} InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -502,7 +516,7 @@ export default function RiparazioniContent() {
       if (column === 'cliente_avvisato') {
         return (
           <Grid item xs={12} sm={6} md={3} key="cliente_avvisato" sx={{ mb: 0.2 }}>
-            <FormControlLabel control={<Checkbox checked={!!formData['cliente_avvisato']} onChange={e => editingId && setFormData({ ...formData, cliente_avvisato: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>cliente avvisato</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+            <FormControlLabel control={<Checkbox checked={!!formData['cliente_avvisato']} onChange={e => editingId && setFormData({ ...formData, cliente_avvisato: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>Cliente Avvisato</span>} sx={{ ml: 0.5, mb: 0.2 }} />
           </Grid>
         );
       }
@@ -517,7 +531,7 @@ export default function RiparazioniContent() {
         }
         return (
           <Grid item xs={12} sm={6} md={3} key="data_checkin" sx={{ mb: 0.2 }}>
-            <TextField type="date" label="data_checkin" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkin: e.target.value })} fullWidth size="small" disabled={!editingId} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+            <TextField type="date" label="Data Arrivo" value={formattedValue} onChange={e => setFormData({ ...formData, data_checkin: e.target.value })} fullWidth size="small" disabled={!editingId} InputLabelProps={{ shrink: true, style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -535,7 +549,7 @@ export default function RiparazioniContent() {
         }
         return (
           <Grid item xs={12} sm={6} md={3} key="data_checkout" sx={{ mb: 0.2 }}>
-            <TextField type="date" label="data_checkout" value={formattedValue} onChange={e => !isReadOnly && setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={isReadOnly} InputLabelProps={{ shrink: true, style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+            <TextField type="date" label="Data Ritiro" value={formattedValue} onChange={e => !isReadOnly && setFormData({ ...formData, data_checkout: e.target.value })} fullWidth size="small" disabled={isReadOnly} InputLabelProps={{ shrink: true, style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
           </Grid>
         );
       }
@@ -543,7 +557,7 @@ export default function RiparazioniContent() {
       if (column === 'stato_riparazione') {
         return (
           <Grid item xs={12} sm={6} md={3} key="stato_riparazione" sx={{ mb: 0.2 }}>
-            <TextField select label="stato_riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => {
+            <TextField select label="Stato Riparazione" value={formData['stato_riparazione'] ?? ''} onChange={e => {
               const newStato = e.target.value;
               const updatedFormData = { ...formData, stato_riparazione: newStato };
               if (['CONSEGNATO', 'RESO AL CLIENTE', 'RIPARAZIONE NON ESEGUITA'].includes(newStato) && !formData['data_checkout']) {
@@ -553,7 +567,7 @@ export default function RiparazioniContent() {
                 updatedFormData.data_checkout = '';
               }
               setFormData(updatedFormData);
-            }} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            }} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               {statoOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}
             </TextField>
@@ -564,7 +578,7 @@ export default function RiparazioniContent() {
       if (column === 'camo') {
         return (
           <Grid item xs={12} sm={6} md={3} key="camo" sx={{ mb: 0.2 }}>
-            <FormControlLabel control={<Checkbox checked={!!formData['camo']} onChange={e => editingId && setFormData({ ...formData, camo: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>camo</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+            <FormControlLabel control={<Checkbox checked={!!formData['camo']} onChange={e => editingId && setFormData({ ...formData, camo: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>Camo</span>} sx={{ ml: 0.5, mb: 0.2 }} />
           </Grid>
         );
       }
@@ -572,7 +586,7 @@ export default function RiparazioniContent() {
       if (column === 'statohpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            <TextField select label={getColumnLabel(column)} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               <MenuItem value="VENDUTO">VENDUTO</MenuItem>
               <MenuItem value="CASA">CASA</MenuItem>
@@ -584,7 +598,7 @@ export default function RiparazioniContent() {
       if (column === 'enginehpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-            <TextField select label={column} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
+            <TextField select label={getColumnLabel(column)} value={formData[column] ?? ''} onChange={e => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.7rem' } }} InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }}>
               <MenuItem value=""><em>-- Seleziona --</em></MenuItem>
               <MenuItem value="INFERNO">INFERNO</MenuItem>
               <MenuItem value="AAP01">AAP01</MenuItem>
@@ -599,7 +613,7 @@ export default function RiparazioniContent() {
       if (column === 'hpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key="hpa" sx={{ mb: 0.2 }}>
-            <FormControlLabel control={<Checkbox checked={!!formData['hpa']} onChange={e => editingId && setFormData({ ...formData, hpa: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>hpa</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+            <FormControlLabel control={<Checkbox checked={!!formData['hpa']} onChange={e => editingId && setFormData({ ...formData, hpa: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>HPA</span>} sx={{ ml: 0.5, mb: 0.2 }} />
           </Grid>
         );
       }
@@ -607,14 +621,14 @@ export default function RiparazioniContent() {
       if (column === 'wraithhpa') {
         return (
           <Grid item xs={12} sm={6} md={3} key="wraithhpa" sx={{ mb: 0.2 }}>
-            <FormControlLabel control={<Checkbox checked={!!formData['wraithhpa']} onChange={e => editingId && setFormData({ ...formData, wraithhpa: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>wraithhpa</span>} sx={{ ml: 0.5, mb: 0.2 }} />
+            <FormControlLabel control={<Checkbox checked={!!formData['wraithhpa']} onChange={e => editingId && setFormData({ ...formData, wraithhpa: e.target.checked ? 1 : 0 })} disabled={!editingId} sx={{ color: 'orange' }} />} label={<span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'grey' }}>Wraith HPA</span>} sx={{ ml: 0.5, mb: 0.2 }} />
           </Grid>
         );
       }
 
       return (
         <Grid item xs={12} sm={6} md={3} key={column} sx={{ mb: 0.2 }}>
-          <TextField label={column} value={formData[column] ?? ''} onChange={(e) => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.8rem' } }} InputLabelProps={{ style: { color: 'grey' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
+          <TextField label={getColumnLabel(column)} value={formData[column] ?? ''} onChange={(e) => setFormData({ ...formData, [column]: e.target.value })} fullWidth size="small" disabled={!editingId} inputProps={{ style: { fontSize: '0.8rem' } }} InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }} sx={{ mb: 0.2, '& .MuiOutlinedInput-input.Mui-disabled': { color: 'white', WebkitTextFillColor: 'white !important' } }} />
         </Grid>
       );
     };
@@ -1020,7 +1034,7 @@ export default function RiparazioniContent() {
                       {columns.includes('foto') && columns.includes('problema_riscontrato') && (
                         <Grid item xs={12} key="foto" sx={{ mb: 0.2 }}>
                           <TextField
-                            label="foto"
+                            label="Foto"
                             value={formData.foto ?? ''}
                             onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
                             fullWidth
@@ -1052,7 +1066,7 @@ export default function RiparazioniContent() {
                       {columns.includes('problema_riscontrato') && (
                         <Grid item xs={12} key="problema_riscontrato" sx={{ mb: 0.2 }}>
                           <TextField
-                            label="problema_riscontrato"
+                            label="Problema Riscontrato"
                             value={formData.problema_riscontrato ?? ''}
                             onChange={(e) => setFormData({ ...formData, problema_riscontrato: e.target.value })}
                             fullWidth
@@ -1239,11 +1253,11 @@ export default function RiparazioniContent() {
         </Box>
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="data_checkin"
+            label="Data Arrivo"
             type="date"
             value={newRepairData.data_checkin}
             onChange={(e) => setNewRepairData({ ...newRepairData, data_checkin: e.target.value })}
-            InputLabelProps={{ shrink: true, style: { color: 'grey' } }}
+            InputLabelProps={{ shrink: true, style: { color: 'grey', fontSize: '0.75rem' } }}
             fullWidth
             size="small"
             sx={{ 
@@ -1252,13 +1266,13 @@ export default function RiparazioniContent() {
             }}
           />
           <TextField
-            label="cognome"
+            label="Nome Cliente"
             value={newRepairData.cognome}
             onChange={(e) => setNewRepairData({ ...newRepairData, cognome: e.target.value })}
             fullWidth
             size="small"
             required
-            InputLabelProps={{ style: { color: 'grey' } }}
+            InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }}
             sx={{ 
               '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
             }}
@@ -1273,11 +1287,11 @@ export default function RiparazioniContent() {
                   sx={{ color: 'orange' }}
                 />
               }
-              label={<span style={{ fontSize: '0.9rem', color: 'grey', fontWeight: 600 }}>garanzia</span>}
+              label={<span style={{ fontSize: '0.9rem', color: 'grey', fontWeight: 600 }}>Garanzia</span>}
             />
           </Box>
           <TextField
-            label="acconto"
+            label="Acconto"
             type="text"
             value={newRepairData.acconto}
             onChange={(e) => {
@@ -1287,7 +1301,7 @@ export default function RiparazioniContent() {
               }
             }}
             size="small"
-            InputLabelProps={{ style: { color: 'grey' } }}
+            InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }}
             InputProps={{
               endAdornment: (
                 <span style={{ color: '#FF9800', fontWeight: 700, fontSize: '1.1rem', marginLeft: 4, paddingRight: 8 }}>€</span>
@@ -1302,27 +1316,27 @@ export default function RiparazioniContent() {
             autoComplete="off"
           />
           <TextField
-            label="problema_riscontrato"
+            label="Problema Riscontrato"
             value={newRepairData.problema_riscontrato}
             onChange={(e) => setNewRepairData({ ...newRepairData, problema_riscontrato: e.target.value })}
             fullWidth
             multiline
             rows={3}
             size="small"
-            InputLabelProps={{ style: { color: 'grey' } }}
+            InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }}
             sx={{ 
               '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
             }}
           />
           <TextField
-            label="accessori"
+            label="Accessori"
             value={newRepairData.accessori}
             onChange={(e) => setNewRepairData({ ...newRepairData, accessori: e.target.value })}
             fullWidth
             multiline
             rows={3}
             size="small"
-            InputLabelProps={{ style: { color: 'grey' } }}
+            InputLabelProps={{ style: { color: 'grey', fontSize: '0.75rem' } }}
             sx={{ 
               '& .MuiOutlinedInput-input': { color: 'white', fontSize: '0.9rem' }
             }}
