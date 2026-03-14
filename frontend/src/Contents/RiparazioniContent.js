@@ -28,6 +28,7 @@ import {
 } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import PrintRoundedIcon from '@mui/icons-material/PrintRounded';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,7 +40,7 @@ import BuildCircleIcon from '@mui/icons-material/BuildCircleOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAllOutlined';
 
 const TABLE_NAME = 'riparazioni';
-const LIST_COLUMNS = ['history_action', 'data_checkin', 'data_checkout', 'cognome', 'stato_riparazione', 'cliente_avvisato', 'hpa'];
+const LIST_COLUMNS = ['history_action', 'id', 'data_checkin', 'data_checkout', 'cognome', 'stato_riparazione', 'cliente_avvisato', 'hpa'];
 
 export default function RiparazioniContent() {
   const theme = useTheme();
@@ -77,6 +78,8 @@ export default function RiparazioniContent() {
   const [validationErrorDialog, setValidationErrorDialog] = useState(false);
   const [openPrint, setOpenPrint] = useState(false);
   const [printData, setPrintData] = useState(null);
+  const [directoryHandle, setDirectoryHandle] = useState(null);
+  const [directoryPath, setDirectoryPath] = useState('');
   // Funzione per aprire il dialog e caricare la cronostoria
   const handleOpenHistory = async (row) => {
     setOpenHistory(true);
@@ -142,6 +145,7 @@ export default function RiparazioniContent() {
 
   const getColumnLabel = (column) => {
     const labels = {
+      'id': 'ID',
       'data_checkin': 'DATA ARRIVO',
       'data_checkout': 'DATA RITIRO',
       'cognome': 'NOME CLIENTE',
@@ -817,6 +821,27 @@ export default function RiparazioniContent() {
                   <PrintRoundedIcon sx={{ fontSize: '1.5rem' }} />
                 </IconButton>
               </Button>
+              <Button 
+                variant="outlined" 
+                color="primary" 
+                size="small"
+                onClick={() => window.open('https://web.whatsapp.com/', '_blank')}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => window.open('https://web.whatsapp.com/', '_blank')}
+                  sx={{
+                    color: '#25D366',
+                    height: 24,
+                    minHeight: 24,
+                    '&:hover': {
+                      backgroundColor: 'rgba(37, 211, 102, 0.1)',
+                    }
+                  }}
+                >
+                  <WhatsAppIcon sx={{ fontSize: '1.5rem' }} />
+                </IconButton>
+              </Button>
             </Box>
             <TableContainer component={Card} sx={{ flex: 1, minHeight: 0, maxHeight: 'calc(100vh - 280px)', overflowY: 'auto', overflowX: 'auto', width: '100%' }}>
               <Table stickyHeader>
@@ -1050,33 +1075,70 @@ export default function RiparazioniContent() {
                       {computeFormFields()} 
                       {columns.includes('foto') && columns.includes('problema_riscontrato') && (
                         <Grid item xs={12} key="foto" sx={{ mb: 0.2 }}>
-                          <TextField
-                            label="Foto"
-                            value={formData.foto ?? ''}
-                            onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
-                            fullWidth
-                            size="small"
-                            disabled={!editingId}
-                            InputLabelProps={{
-                              style: {
-                                fontSize: '0.91rem',
-                                fontWeight: 700,
-                                letterSpacing: 0.2,
-                                color: 'grey',
-                                textShadow: '0 1px 3px #000, 0 0px 1px #222',
-                                WebkitTextStroke: '0.2px #222'
-                              }
-                            }}
-                            inputProps={{
-                              style: {
-                                fontSize: '0.81rem',
-                                padding: '10px 9px 4px 9px',
-                                color: 'white',
-                                '::placeholder': { color: 'orange', opacity: 1 }
-                              }
-                            }}
-                            sx={{ mb: 0.2 }}
-                          />
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                            <TextField
+                              label="Foto"
+                              value={formData.foto ?? ''}
+                              onClick={async () => {
+                                if (editingId && directoryHandle) {
+                                  try {
+                                    const fileHandle = await directoryHandle.getFileHandle(directoryHandle.name);
+                                    const file = await fileHandle.getFile();
+                                    setFormData({ ...formData, foto: file.path || directoryPath });
+                                  } catch (err) {
+                                    // Semplice accesso al path memorizzato
+                                    setFormData({ ...formData, foto: directoryPath });
+                                  }
+                                }
+                              }}
+                              onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
+                              fullWidth
+                              size="small"
+                              disabled={!editingId}
+                              placeholder="Es: /Users/alessio/Foto"
+                              InputLabelProps={{
+                                style: {
+                                  fontSize: '0.91rem',
+                                  fontWeight: 700,
+                                  letterSpacing: 0.2,
+                                  color: 'grey',
+                                  textShadow: '0 1px 3px #000, 0 0px 1px #222',
+                                  WebkitTextStroke: '0.2px #222'
+                                }
+                              }}
+                              inputProps={{
+                                style: {
+                                  fontSize: '0.81rem',
+                                  padding: '10px 9px 4px 9px',
+                                  color: 'white',
+                                  '::placeholder': { color: 'orange', opacity: 1 },
+                                  cursor: editingId ? 'pointer' : 'default'
+                                }
+                              }}
+                              sx={{ mb: 0.2 }}
+                            />
+                            {typeof window !== 'undefined' && window.showDirectoryPicker && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={async () => {
+                                  try {
+                                    const handle = await window.showDirectoryPicker();
+                                    setDirectoryHandle(handle);
+                                    const fullPath = `/Volumes/Dati/${handle.name}`;
+                                    setDirectoryPath(fullPath);
+                                    setFormData({ ...formData, foto: fullPath });
+                                  } catch (err) {
+                                    // Selezione annullata
+                                  }
+                                }}
+                                disabled={!editingId}
+                                sx={{ mt: 1, whiteSpace: 'nowrap' }}
+                              >
+                                Cartella
+                              </Button>
+                            )}
+                          </Box>
                         </Grid>
                       )}
                       {/* Campo problema_riscontrato in fondo, largo 4 colonne */}
