@@ -38,6 +38,7 @@ import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import DeleteSweepRoundedIcon from '@mui/icons-material/DeleteSweepRounded';
+import PrintRoundedIcon from '@mui/icons-material/PrintRounded';
 
 // Tema gestito in App.js
 
@@ -69,6 +70,11 @@ function CassaContent() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastSeverity, setToastSeverity] = useState('success');
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [openPrintDialog, setOpenPrintDialog] = useState(false);
+  const [printNome, setPrintNome] = useState('');
+  const [printCognome, setPrintCognome] = useState('');
+  const [printValidoDal, setPrintValidoDal] = useState('');
+  const [printValidoAl, setPrintValidoAl] = useState('');
   // Ordinamento multiplo: array di {column, order}
   const [sortCriteria, setSortCriteria] = useState(initialData.sortCriteria);
   const [sortCriteriaSelected] = useState([{ column: 'codice', order: 'asc' }]);
@@ -955,18 +961,32 @@ function CassaContent() {
                       />
                     </Box>
                     {articoliSelezionati.length > 0 && (
-                      <IconButton
-                        size="small"
-                        onClick={() => setArticoliSelezionati([])}
-                        sx={{
-                          color: '#FF9800',
-                          '&:hover': {
-                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
-                          }
-                        }}
-                      >
-                        <DeleteSweepRoundedIcon sx={{ fontSize: '1.5rem' }} />
-                      </IconButton>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => setOpenPrintDialog(true)}
+                          sx={{
+                            color: '#FF9800',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                            }
+                          }}
+                        >
+                          <PrintRoundedIcon sx={{ fontSize: '1.5rem' }} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => setArticoliSelezionati([])}
+                          sx={{
+                            color: '#FF9800',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                            }
+                          }}
+                        >
+                          <DeleteSweepRoundedIcon sx={{ fontSize: '1.5rem' }} />
+                        </IconButton>
+                      </Box>
                     )}
                   </Box>
 
@@ -1277,6 +1297,176 @@ function CassaContent() {
         </DialogActions>
       </Dialog>
       
+      {/* Dialog Stampa Carrello */}
+      <Dialog open={openPrintDialog} onClose={() => setOpenPrintDialog(false)} maxWidth="md" fullWidth>
+        <Box sx={{ bgcolor: 'white', p: 2 }} id="print-content">
+          <Box sx={{ fontFamily: 'Arial, sans-serif', color: '#000' }}>
+            {/* Intestazione */}
+            <div style={{ borderBottom: '2px solid #FF9800', paddingBottom: 6, marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <span style={{ fontWeight: 700, fontSize: '16px', letterSpacing: 1, color: '#FF9800' }}>PREVENTIVO</span>
+              <span style={{ fontSize: '11px', color: '#FF9800' }}>Data: {new Date().toLocaleDateString('it-IT')}</span>
+            </div>
+
+            {/* Campi Nome/Cognome e Date */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontWeight: 700, fontSize: '10px', color: '#FF9800', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16, borderBottom: '2px solid #FF9800', paddingBottom: 2 }}>
+                Dati Cliente
+              </div>
+              <Box sx={{ display: 'flex', gap: 2, mb: 1, flexWrap: 'wrap', '@media print': { '& .MuiTextField-root': { '& .MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' } } } }}>
+                <TextField
+                  label="Nome"
+                  value={printNome}
+                  onChange={(e) => setPrintNome(e.target.value)}
+                  size="small"
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' } } }}
+                />
+                <TextField
+                  label="Cognome"
+                  value={printCognome}
+                  onChange={(e) => setPrintCognome(e.target.value)}
+                  size="small"
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' } } }}
+                />
+                <TextField
+                  label="Valido dal"
+                  type="date"
+                  value={printValidoDal}
+                  onChange={(e) => setPrintValidoDal(e.target.value)}
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' }, '& input[type="date"]::-webkit-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-moz-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-ms-input': { filter: 'invert(1)' } } }}
+/>
+                <TextField
+                  label="Valido al"
+                  type="date"
+                  value={printValidoAl}
+                  onChange={(e) => setPrintValidoAl(e.target.value)}
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ flex: 1, minWidth: '150px', '@media print': { display: 'none' }, '& .MuiOutlinedInput-input': { color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' }, '& input[type="date"]::-webkit-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-moz-calendar-picker-indicator': { filter: 'invert(1)' }, '& input[type="date"]::-ms-input': { filter: 'invert(1)' } } }}
+/>
+              </Box>
+              {/* Versione stampabile dei campi */}
+              <div style={{ display: 'none' }} className="print-client-info">
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 4 }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ width: '25%', padding: '3px 6px', verticalAlign: 'top' }}>
+                        <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Nome</div>
+                        <div style={{ fontSize: '11px', fontWeight: 500, marginTop: 2 }}>{printNome || '—'}</div>
+                      </td>
+                      <td style={{ width: '25%', padding: '3px 6px', verticalAlign: 'top' }}>
+                        <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Cognome</div>
+                        <div style={{ fontSize: '11px', fontWeight: 500, marginTop: 2 }}>{printCognome || '—'}</div>
+                      </td>
+                      <td style={{ width: '25%', padding: '3px 6px', verticalAlign: 'top' }}>
+                        <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Valido dal</div>
+                        <div style={{ fontSize: '11px', fontWeight: 500, marginTop: 2 }}>{printValidoDal ? new Date(printValidoDal).toLocaleDateString('it-IT') : '—'}</div>
+                      </td>
+                      <td style={{ width: '25%', padding: '3px 6px', verticalAlign: 'top' }}>
+                        <div style={{ fontSize: '8px', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Valido al</div>
+                        <div style={{ fontSize: '11px', fontWeight: 500, marginTop: 2 }}>{printValidoAl ? new Date(printValidoAl).toLocaleDateString('it-IT') : '—'}</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Tabella Articoli */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontWeight: 700, fontSize: '10px', color: '#FF9800', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4, borderBottom: '2px solid #FF9800', paddingBottom: 2 }}>
+                Articoli
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f5f5f5' }}>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'left', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Codice</th>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'left', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Descrizione</th>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'center', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Colore</th>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'center', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Taglia</th>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'center', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Qtà</th>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'right', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Prezzo Unit.</th>
+                    <th style={{ padding: '6px 8px', fontSize: '9px', fontWeight: 700, textAlign: 'right', borderBottom: '2px solid #000', textTransform: 'uppercase' }}>Totale</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {articoliSelezionatiOrdinati.map((articolo, index) => {
+                    const prezzo = articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato) : parseFloat(articolo.prezzo_originale || 0);
+                    const totaleRiga = prezzo * articolo.quantita;
+                    let coloreName = (articolo.colore_estratto || articolo.colore || '—').toString().toUpperCase().trim();
+                    let tagliaName = (articolo.taglia_estratta || articolo.dimensioni || articolo.taglia || '').toString().toUpperCase().trim();
+                    if (coloreName === 'MULTICAM' && tagliaName === 'BLACK') {
+                      coloreName = 'MULTICAM BLACK';
+                      tagliaName = '';
+                    }
+                    return (
+                      <tr key={articolo.codice} style={{ borderBottom: '1px solid #eee', backgroundColor: index % 2 === 0 ? '#fff' : '#fafafa' }}>
+                        <td style={{ padding: '5px 8px', fontSize: '10px', fontWeight: 600 }}>{articolo.codice}</td>
+                        <td style={{ padding: '5px 8px', fontSize: '10px' }}>{articolo.descrizione?.replace(/\[.*?\]/g, '').trim().toUpperCase()}</td>
+                        <td style={{ padding: '5px 8px', fontSize: '10px', textAlign: 'center' }}>{coloreName}</td>
+                        <td style={{ padding: '5px 8px', fontSize: '10px', textAlign: 'center' }}>{tagliaName || '—'}</td>
+                        <td style={{ padding: '5px 8px', fontSize: '10px', textAlign: 'center', fontWeight: 600 }}>{articolo.quantita}</td>
+                        <td style={{ padding: '5px 8px', fontSize: '10px', textAlign: 'right' }}>{prezzo.toFixed(2)} €</td>
+                        <td style={{ padding: '5px 8px', fontSize: '10px', textAlign: 'right', fontWeight: 600 }}>{totaleRiga.toFixed(2)} €</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr style={{ borderTop: '2px solid #FF9800' }}>
+                    <td colSpan="4" />
+                    <td style={{ padding: '8px', fontSize: '11px', fontWeight: 700, textAlign: 'center', color: '#FF9800' }}>
+                      {articoliSelezionatiOrdinati.reduce((sum, a) => sum + a.quantita, 0)}
+                    </td>
+                    <td style={{ padding: '8px', fontSize: '11px', fontWeight: 700, textAlign: 'right', color: '#FF9800' }}>TOTALE</td>
+                    <td style={{ padding: '8px', fontSize: '13px', fontWeight: 700, textAlign: 'right', color: '#FF9800' }}>
+                      {articoliSelezionatiOrdinati.reduce((total, articolo) => {
+                        const prezzo = articolo.prezzo_scontato ? parseFloat(articolo.prezzo_scontato) : parseFloat(articolo.prezzo_originale || 0);
+                        return total + (prezzo * articolo.quantita);
+                      }, 0).toFixed(2)} €
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            {/* Bottoni (nascosti in stampa) */}
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2, '@media print': { display: 'none' } }}>
+              <Button
+                variant="outlined"
+                onClick={() => setOpenPrintDialog(false)}
+                size="small"
+                sx={{ color: '#000', borderColor: '#000' }}
+              >
+                Chiudi
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => window.print()}
+                size="small"
+                sx={{ bgcolor: '#FF9800', color: '#000', fontWeight: 700 }}
+              >
+                Stampa
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Dialog>
+
+      <style>{`
+        @media print {
+          body * { visibility: hidden !important; }
+          #print-content, #print-content * { visibility: visible !important; }
+          #print-content { position: absolute; left: 0; top: 0; width: 100%; }
+          #print-content .print-client-info { display: block !important; }
+          #print-content span, #print-content div, #print-content td, #print-content th {
+            color: #000 !important;
+            border-color: #000 !important;
+          }
+        }
+      `}</style>
+
       <Dialog
         open={openToast}
         onClose={() => setOpenToast(false)}
